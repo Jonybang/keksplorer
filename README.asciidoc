@@ -11,6 +11,6 @@ Explorer web interface and api endpoints.
 * GET `/api/transactions` - list of all transactions seen in blocks
 * GET `/api/transactions/#{transaction_id}` - fetch transaction information by it's id
 * GET `/api/accounts` - list of all accounts seen in transactions
-* GET `/api/accounts/#{account_id}` - fetch account information by it's id
+* GET `/api/accounts/#{account_id}/transactions` - fetch account transactions list by account id
 
 TODO: add pagination and list limits.
