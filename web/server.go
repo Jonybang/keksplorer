@@ -12,6 +12,8 @@ import (
 	"github.com/gorilla/mux"
 )
 
+const version = "0.1.0"
+
 var redisClient *redis.Client
 
 func main() {
