@@ -10,6 +10,12 @@ worker-dev:
 agent-dev:
 	export $(ENV_VARS) && node agent/agent.js
 
+up:
+	docker-compose -f prod-stack.yml up
+
+down:
+	docker-compose -f prod-stack.yml down --volumes
+
 dev-compose-up:
 	docker-compose -f dev-stack.yml up
 
@@ -17,10 +23,10 @@ dev-compose-down:
 	docker-compose -f dev-stack.yml down
 
 docker-build-worker:
-	cd worker && npm install && docker build -t keksplorer-worker .
+	cd worker && docker build -t keksplorer-worker .
 
 docker-build-agent:
-	cd agent && npm install && docker build -t keksplorer-agent .
+	cd agent && docker build -t keksplorer-agent .
 
 docker-build-web: clean
 	mkdir -p ./build/gopath/src/web

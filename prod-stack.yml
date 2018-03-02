@@ -5,5 +5,53 @@ services:
     image: redis:4.0-alpine
     ports:
       - 6379
-    env_file:
-      - .env.prod
+    networks:
+      - knet
+
+  parity:
+    image: parity/parity:v1.9.4
+    ports:
+      - 8545
+      - 8546
+    command: --config /parity/config/node.toml
+    volumes:
+      - ./config/parity:/parity/config:ro
+    networks:
+      - knet
+
+  web:
+    image: chebykin/keksplorer-web:latest
+    depends_on:
+      - redis
+    ports:
+      - 8080:8080
+    environment:
+      - WS_API_URL=http://parity:8546
+      - REDIS_URL=redis://redis:6379/0
+    networks:
+      - knet
+
+  agent:
+    image: chebykin/keksplorer-agent:latest
+    depends_on:
+      - redis
+      - parity
+    environment:
+      - WS_API_URL=http://parity:8546
+      - REDIS_URL=redis://redis:6379/0
+    networks:
+      - knet
+
+  worker:
+    image: chebykin/keksplorer-worker:latest
+    depends_on:
+      - redis
+      - parity
+    environment:
+      - JSON_RPC_API_URL=http://parity:8545
+      - REDIS_URL=redis://redis:6379/0
+    networks:
+      - knet
+
+networks:
+  knet:
