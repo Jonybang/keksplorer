@@ -1,0 +1,16 @@
+= keksplorer
+
+
+== keksplorer-web
+Explorer web interface and api endpoints.
+
+=== API endpoints
+
+* GET `/api/latest_block` - latest block at the moment
+* GET `/api/blocks/#{block_id}` - fetch block information by it's id
+* GET `/api/transactions` - list of all transactions seen in blocks
+* GET `/api/transactions/#{transaction_id}` - fetch transaction information by it's id
+* GET `/api/accounts` - list of all accounts seen in transactions
+* GET `/api/accounts/#{account_id}` - fetch account information by it's id
+
+TODO: add pagination and list limits.
