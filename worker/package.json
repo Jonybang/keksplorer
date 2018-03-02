@@ -2,7 +2,7 @@
   "name": "keksplorer-worker",
   "version": "0.1.1",
   "description": "",
-  "main": "app.js",
+  "main": "worker.js",
   "dependencies": {
     "bluebird": "^3.5.1",
     "redis": "^2.8.0",
@@ -11,7 +11,7 @@
   },
   "devDependencies": {},
   "scripts": {
-    "start": "",
+    "start": "node worker.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
