@@ -1,13 +1,13 @@
 const Web3 = require('web3');
 const redis = require('redis');
 
-const WS_RPC_URL = "ws://127.0.0.1:8546" || process.env.WS_RPC_URL;
-const REDIS_URL = "redis://127.0.0.1:6379" || process.env.REDIS_URL;
+const WS_API_URL = process.env.WS_API_URL || "ws://127.0.0.1:8546";
+const REDIS_URL = process.env.REDIS_URL || "redis://127.0.0.1:6379";
 const RECONNECTION_MULTIPLIER = 1000;
 
 const redisClient = redis.createClient(REDIS_URL);
 
-let web3 = new Web3(new Web3.providers.WebsocketProvider(WS_RPC_URL));
+let web3 = new Web3(new Web3.providers.WebsocketProvider(WS_API_URL));
 let reconnectionTimeout = 5;
 let subscription = null;
 let reconnection = null;
@@ -35,7 +35,7 @@ let reconnection = null;
 
 async function getWSProvider() {
   return new Promise((resolve, reject) => {
-    resolve(new Web3.providers.WebsocketProvider(WS_RPC_URL));
+    resolve(new Web3.providers.WebsocketProvider(WS_API_URL));
   });
 }
 
