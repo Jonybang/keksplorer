@@ -29,7 +29,8 @@ func main() {
 	r.HandleFunc("/api/transactions", transactionsController).Methods("GET")
 	r.HandleFunc("/api/transactions/{hash}", transactionController).Methods("GET")
 	r.HandleFunc("/api/accounts", accountsController).Methods("GET")
-	r.HandleFunc("/api/accounts/{address}", accountController).Methods("GET")
+	r.HandleFunc("/api/accounts/{address}/transactions",
+		accountTranscationsController).Methods("GET")
 
 	srv := &http.Server{
 		Handler:      r,
@@ -189,6 +190,28 @@ func accountController(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Println("Error while marshalling account detail: ", err)
+	}
+
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprintf(w, string(jsonString))
+}
+
+func accountTranscationsController(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+
+	tx, err := redisClient.ZRange(
+		fmt.Sprintf("account:%v:tx_list", vars["address"]), int64(0), int64(-1)).
+		Result()
+
+	if err != nil {
+		log.Println("Error while getting account transactions: ", vars["address"],
+			err)
+	}
+
+	jsonString, err := json.Marshal(tx)
+
+	if err != nil {
+		log.Println("Error while marshalling account transactions: ", err)
 	}
 
 	w.WriteHeader(http.StatusOK)
