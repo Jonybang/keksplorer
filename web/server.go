@@ -19,9 +19,14 @@ func main() {
 
 	r := mux.NewRouter()
 
+	urlOpts, err := redis.ParseURL(os.Getenv("REDIS_URL"))
+
+	if err != nil {
+		log.Println("Error while getting $REDIS_URL: ", err)
+	}
+
 	redisClient = redis.NewClient(&redis.Options{
-		// REDIS_URL should be similar to 127.0.0.1:6379
-		Addr:     os.Getenv("REDIS_URL"),
+		Addr:     urlOpts.Addr,
 		Password: "",
 		DB:       0,
 	})
