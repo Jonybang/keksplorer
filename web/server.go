@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 	"os"
@@ -33,6 +34,11 @@ func main() {
 		DB:       0,
 	})
 
+	// VIEW
+	r.HandleFunc("/", mainViewController).Methods("GET")
+	r.HandleFunc("/latest_block", latestBlockViewController).Methods("GET")
+
+	// API
 	r.HandleFunc("/api/latest_block", latestBlockController).Methods("GET")
 	r.HandleFunc("/api/blocks/{blockNumber}", blockController).Methods("GET")
 	r.HandleFunc("/api/transactions", transactionsController).Methods("GET")
@@ -49,6 +55,43 @@ func main() {
 	}
 
 	log.Fatal(srv.ListenAndServe())
+}
+
+func mainViewController(w http.ResponseWriter, r *http.Request) {
+	dir, err := os.Getwd()
+
+	if err != nil {
+		log.Println("Error while getting current directory: ", err)
+	}
+
+	tmpl := template.Must(template.ParseFiles(dir + "/web/public/index.html"))
+
+	tmpl.Execute(w, "")
+}
+
+func latestBlockViewController(w http.ResponseWriter, r *http.Request) {
+	blocks, err := redisClient.Keys("block:*:detail").Result()
+
+	if err != nil {
+		log.Println("Error while getting latest block: ", err)
+	}
+
+	latestBlock, err := redisClient.HGetAll(
+		fmt.Sprintf("block:%v:detail", len(blocks)-1)).Result()
+
+	if err != nil {
+		log.Println("Error while getting latest block: ", err)
+	}
+
+	dir, err := os.Getwd()
+
+	if err != nil {
+		log.Println("Error while getting current directory: ", err)
+	}
+
+	tmpl := template.Must(template.ParseFiles(dir + "/web/public/latest_block.html"))
+
+	tmpl.Execute(w, latestBlock)
 }
 
 func latestBlockController(w http.ResponseWriter, r *http.Request) {
