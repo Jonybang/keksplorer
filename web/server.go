@@ -15,6 +15,8 @@ import (
 var redisClient *redis.Client
 
 func main() {
+	log.Println("info:", getVersion())
+
 	r := mux.NewRouter()
 
 	redisClient = redis.NewClient(&redis.Options{
@@ -216,4 +218,8 @@ func accountTranscationsController(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprintf(w, string(jsonString))
+}
+
+func getVersion() string {
+	return fmt.Sprintf("API version: v%v", version)
 }
