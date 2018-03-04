@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 	"os"
@@ -19,13 +20,23 @@ var redisClient *redis.Client
 func main() {
 	r := mux.NewRouter()
 
+	urlOpts, err := redis.ParseURL(os.Getenv("REDIS_URL"))
+
+	if err != nil {
+		log.Println("Error while getting $REDIS_URL: ", err)
+	}
+
 	redisClient = redis.NewClient(&redis.Options{
-		// REDIS_URL should be similar to 127.0.0.1:6379
-		Addr:     os.Getenv("REDIS_URL"),
+		Addr:     urlOpts.Addr,
 		Password: "",
 		DB:       0,
 	})
 
+	// VIEW
+	r.HandleFunc("/", mainViewController).Methods("GET")
+	r.HandleFunc("/latest_block", latestBlockViewController).Methods("GET")
+
+	// API
 	r.HandleFunc("/api/latest_block", latestBlockController).Methods("GET")
 	r.HandleFunc("/api/blocks/{blockNumber}", blockController).Methods("GET")
 	r.HandleFunc("/api/transactions", transactionsController).Methods("GET")
@@ -44,11 +55,27 @@ func main() {
 	log.Fatal(srv.ListenAndServe())
 }
 
-func latestBlockController(w http.ResponseWriter, r *http.Request) {
+func mainViewController(w http.ResponseWriter, r *http.Request) {
+	dir, err := os.Getwd()
+
+	if err != nil {
+		log.Println("Error while getting current directory: ", err)
+		respondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	tmpl := template.Must(template.ParseFiles(dir + "/web/public/index.html"))
+
+	tmpl.Execute(w, "")
+}
+
+func latestBlockViewController(w http.ResponseWriter, r *http.Request) {
 	blocks, err := redisClient.Keys("block:*:detail").Result()
 
 	if err != nil {
 		log.Println("Error while getting latest block: ", err)
+		respondWithError(w, http.StatusInternalServerError, err)
+		return
 	}
 
 	latestBlock, err := redisClient.HGetAll(
@@ -56,12 +83,47 @@ func latestBlockController(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Println("Error while getting latest block: ", err)
+		respondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	dir, err := os.Getwd()
+
+	if err != nil {
+		log.Println("Error while getting current directory: ", err)
+		respondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	tmpl := template.Must(template.ParseFiles(dir + "/web/public/latest_block.html"))
+
+	tmpl.Execute(w, latestBlock)
+}
+
+func latestBlockController(w http.ResponseWriter, r *http.Request) {
+	blocks, err := redisClient.Keys("block:*:detail").Result()
+
+	if err != nil {
+		log.Println("Error while getting latest block: ", err)
+		respondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	latestBlock, err := redisClient.HGetAll(
+		fmt.Sprintf("block:%v:detail", len(blocks)-1)).Result()
+
+	if err != nil {
+		log.Println("Error while getting latest block: ", err)
+		respondWithError(w, http.StatusInternalServerError, err)
+		return
 	}
 
 	jsonString, err := json.Marshal(latestBlock)
 
 	if err != nil {
 		log.Println("Error while marshalling latest block: ", err)
+		respondWithError(w, http.StatusInternalServerError, err)
+		return
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -78,12 +140,16 @@ func blockController(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Println("Error while getting block #", vars["blockNumber"], err)
+		respondWithError(w, http.StatusInternalServerError, err)
+		return
 	}
 
 	jsonString, err := json.Marshal(block)
 
 	if err != nil {
 		log.Println("Error while marshalling block #", vars["blockNumber"], err)
+		respondWithError(w, http.StatusInternalServerError, err)
+		return
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -95,6 +161,8 @@ func transactionsController(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Println("Error while getting transactions list: ", err)
+		respondWithError(w, http.StatusInternalServerError, err)
+		return
 	}
 
 	transactions := []string{}
@@ -113,6 +181,8 @@ func transactionsController(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Println("Error while marshalling transactions: ", err)
+		respondWithError(w, http.StatusInternalServerError, err)
+		return
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -128,6 +198,8 @@ func transactionController(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println("Error while getting transaction detail with hash: ",
 			vars["hash"], err)
+		respondWithError(w, http.StatusInternalServerError, err)
+		return
 	}
 
 	txDetail, err := redisClient.HGetAll(txKey[0]).Result()
@@ -135,12 +207,16 @@ func transactionController(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println("Error while getting transaction detail with hash: ",
 			vars["hash"], err)
+		respondWithError(w, http.StatusInternalServerError, err)
+		return
 	}
 
 	jsonString, err := json.Marshal(txDetail)
 
 	if err != nil {
 		log.Println("Error while marshalling transaction detail: ", err)
+		respondWithError(w, http.StatusInternalServerError, err)
+		return
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -153,6 +229,8 @@ func accountsController(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Println("Error while getting accounts list: ", err)
+		respondWithError(w, http.StatusInternalServerError, err)
+		return
 	}
 
 	accounts := []string{}
@@ -171,6 +249,8 @@ func accountsController(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Println("Error while marshalling accounts list: ", err)
+		respondWithError(w, http.StatusInternalServerError, err)
+		return
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -186,12 +266,16 @@ func accountController(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Println("Error while getting account by hash: ", vars["address"], err)
+		respondWithError(w, http.StatusInternalServerError, err)
+		return
 	}
 
 	jsonString, err := json.Marshal(account)
 
 	if err != nil {
 		log.Println("Error while marshalling account detail: ", err)
+		respondWithError(w, http.StatusInternalServerError, err)
+		return
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -208,14 +292,23 @@ func accountTranscationsController(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println("Error while getting account transactions: ", vars["address"],
 			err)
+		respondWithError(w, http.StatusInternalServerError, err)
+		return
 	}
 
 	jsonString, err := json.Marshal(tx)
 
 	if err != nil {
 		log.Println("Error while marshalling account transactions: ", err)
+		respondWithError(w, http.StatusInternalServerError, err)
+		return
 	}
 
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprintf(w, string(jsonString))
+}
+
+func respondWithError(w http.ResponseWriter, httpStatus int, err error) {
+	w.WriteHeader(httpStatus)
+	fmt.Fprintf(w, err.Error())
 }
