@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"html/template"
 	"log"
@@ -33,6 +34,9 @@ func main() {
 	// VIEW
 	r.HandleFunc("/", mainViewController).Methods("GET")
 	r.HandleFunc("/latest_block", latestBlockViewController).Methods("GET")
+	r.HandleFunc("/blocks/{blockNumber}", blockViewController).Methods("GET")
+	r.HandleFunc("/transactions", transactionsViewController).Methods("GET")
+	r.HandleFunc("/transactions/{hash}", transactionViewController).Methods("GET")
 
 	// API
 	r.HandleFunc("/api/latest_block", latestBlockController).Methods("GET")
@@ -41,7 +45,13 @@ func main() {
 	r.HandleFunc("/api/transactions/{hash}", transactionController).Methods("GET")
 	r.HandleFunc("/api/accounts", accountsController).Methods("GET")
 	r.HandleFunc("/api/accounts/{address}/transactions",
-		accountTranscationsController).Methods("GET")
+		accountTransactionsController).Methods("GET")
+
+	staticDir := getWorkDir() + "/web/public/assets/"
+
+	// STATIC
+	r.PathPrefix("/assets").
+		Handler(http.StripPrefix("/assets", http.FileServer(http.Dir(staticDir))))
 
 	srv := &http.Server{
 		Handler:      r,
@@ -53,14 +63,10 @@ func main() {
 	log.Fatal(srv.ListenAndServe())
 }
 
-func mainViewController(w http.ResponseWriter, r *http.Request) {
-	dir, err := os.Getwd()
+// VIEW
 
-	if err != nil {
-		log.Println("Error while getting current directory: ", err)
-		respondWithError(w, http.StatusInternalServerError, err)
-		return
-	}
+func mainViewController(w http.ResponseWriter, r *http.Request) {
+	dir := getWorkDir()
 
 	tmpl := template.Must(template.ParseFiles(dir + "/web/public/index.html"))
 
@@ -85,18 +91,104 @@ func latestBlockViewController(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	dir, err := os.Getwd()
-
-	if err != nil {
-		log.Println("Error while getting current directory: ", err)
-		respondWithError(w, http.StatusInternalServerError, err)
-		return
-	}
+	dir := getWorkDir()
 
 	tmpl := template.Must(template.ParseFiles(dir + "/web/public/latest_block.html"))
 
 	tmpl.Execute(w, latestBlock)
 }
+
+func blockViewController(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+
+	block, err := redisClient.HGetAll(
+		fmt.Sprintf("block:%v:detail", vars["blockNumber"])).Result()
+
+	log.Println(fmt.Sprintf("Get block: %v", block))
+
+	if err != nil {
+		log.Println("Error while getting block #", vars["blockNumber"], err)
+		respondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	dir := getWorkDir()
+
+	tmpl := template.Must(template.ParseFiles(dir + "/web/public/block.html"))
+
+	tmpl.Execute(w, block)
+}
+
+func transactionsViewController(w http.ResponseWriter, r *http.Request) {
+	keys, err := redisClient.Keys("block:*:tx_list").Result()
+
+	if err != nil {
+		log.Println("Error while getting transactions list: ", err)
+		respondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	transactions := []string{}
+	for _, key := range keys {
+		tx, err := redisClient.ZRange(key, int64(0), int64(-1)).Result()
+
+		if err != nil {
+			log.Println("Error while getting transaction list: ", err)
+			continue
+		}
+
+		transactions = append(transactions, tx...)
+	}
+
+	dir := getWorkDir()
+
+	tmpl := template.Must(template.ParseFiles(
+		dir + "/web/public/transactions.html"))
+
+	tmpl.Execute(w, transactions)
+}
+
+func transactionViewController(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+
+	txKey, err := redisClient.Keys(
+		fmt.Sprintf("block_tx:*:%v:detail", vars["hash"])).Result()
+
+	if err != nil {
+		log.Println("Error while getting transaction detail with hash: ",
+			vars["hash"], err)
+		respondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	if len(txKey) == 0 {
+		err := errors.New("Wrong hash, can't find any transaction with hash: " +
+			vars["hash"])
+
+		log.Println(err)
+
+		respondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	txDetail, err := redisClient.HGetAll(txKey[0]).Result()
+
+	if err != nil {
+		log.Println("Error while getting transaction detail with hash: ",
+			vars["hash"], err)
+		respondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	dir := getWorkDir()
+
+	tmpl := template.Must(template.ParseFiles(
+		dir + "/web/public/transaction.html"))
+
+	tmpl.Execute(w, txDetail)
+}
+
+// API
 
 func latestBlockController(w http.ResponseWriter, r *http.Request) {
 	blocks, err := redisClient.Keys("block:*:detail").Result()
@@ -200,6 +292,14 @@ func transactionController(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if len(txKey) == 0 {
+		err := errors.New("Wrong hash, can't find any transaction with hash: " +
+			vars["hash"])
+
+		respondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
+
 	txDetail, err := redisClient.HGetAll(txKey[0]).Result()
 
 	if err != nil {
@@ -280,7 +380,7 @@ func accountController(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, string(jsonString))
 }
 
-func accountTranscationsController(w http.ResponseWriter, r *http.Request) {
+func accountTransactionsController(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
 	tx, err := redisClient.ZRange(
@@ -306,7 +406,19 @@ func accountTranscationsController(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, string(jsonString))
 }
 
+// HELPERS
+
 func respondWithError(w http.ResponseWriter, httpStatus int, err error) {
 	w.WriteHeader(httpStatus)
 	fmt.Fprintf(w, err.Error())
+}
+
+func getWorkDir() string {
+	dir, err := os.Getwd()
+
+	if err != nil {
+		log.Println("Error while trying to get work directory:", err)
+	}
+
+	return dir
 }

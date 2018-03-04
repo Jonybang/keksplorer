@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>Welcome</title>
+	<title>Block #{{.number}}</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
 </head>
@@ -15,11 +15,11 @@
 		  </button>
 		  <div class="collapse navbar-collapse" id="navbarNav">
 		    <ul class="navbar-nav  mr-auto">
-		      <li class="nav-item active">
-		        <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+		      <li class="nav-item">
+		        <a class="nav-link" href="/">Home </a>
 		      </li>
 		      <li class="nav-item">
-		        <a class="nav-link" href="/latest_block">Latest Block </a>
+		        <a class="nav-link" href="/latest_block">Latest Block <span class="sr-only">(current)</span></a>
 		      </li>
 		      <li class="nav-item">
 		        <a class="nav-link" href="/transactions">Transactions </a>
@@ -32,10 +32,23 @@
 		  </div>
 		</nav>
 
+	{{if .}}
 		<center>
-			<h1>Please use menu or search</h1>
+			<h1>Block #{{.number}}</h1>
 		</center>
 		<hr>
+		<p>Gas Used: {{.gasUsed}}</p>
+		<p>Hash: {{.hash}}</p>
+		<p>Number: {{.number}}</p>
+		<p>Size: {{.size}}</p>
+		<p>Timestamp: {{.timestamp}}</p>
+		<p>Validator: {{.validator}}</p>
+	{{else}}
+		<center>
+			<h1>There is not such block</h1>
+		</center>
+		<hr>
+	{{end}}
 	</div>
 
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>

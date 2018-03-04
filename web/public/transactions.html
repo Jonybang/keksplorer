@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>Welcome</title>
+	<title>Transactions list</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
 </head>
@@ -15,14 +15,14 @@
 		  </button>
 		  <div class="collapse navbar-collapse" id="navbarNav">
 		    <ul class="navbar-nav  mr-auto">
-		      <li class="nav-item active">
-		        <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+		      <li class="nav-item">
+		        <a class="nav-link" href="/">Home </a>
 		      </li>
 		      <li class="nav-item">
 		        <a class="nav-link" href="/latest_block">Latest Block </a>
 		      </li>
-		      <li class="nav-item">
-		        <a class="nav-link" href="/transactions">Transactions </a>
+		      <li class="nav-item active">
+		        <a class="nav-link" href="/transactions">Transactions <span class="sr-only">(current)</span></a>
 		      </li>
 		    </ul>
 	      <form class="form-inline my-2 my-lg-0">
@@ -33,9 +33,18 @@
 		</nav>
 
 		<center>
-			<h1>Please use menu or search</h1>
+			<h1>Transactions list</h1>
 		</center>
 		<hr>
+
+		<ul>
+			{{range .}}
+				<li>
+					<a href="/transactions/{{.}}">{{.}}</a>
+				</li>
+			{{end}}
+		</ul>
+
 	</div>
 
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
