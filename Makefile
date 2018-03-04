@@ -16,10 +16,10 @@ up:
 down:
 	docker-compose -f prod-stack.yml down --volumes
 
-dev-compose-up:
+up-dev:
 	docker-compose -f dev-stack.yml up
 
-dev-compose-down:
+down-dev:
 	docker-compose -f dev-stack.yml down
 
 docker-build-worker:
