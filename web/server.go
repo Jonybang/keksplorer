@@ -13,13 +13,9 @@ import (
 	"github.com/gorilla/mux"
 )
 
-const version = "0.1.0"
-
 var redisClient *redis.Client
 
 func main() {
-	log.Println("info:", getVersion())
-
 	r := mux.NewRouter()
 
 	urlOpts, err := redis.ParseURL(os.Getenv("REDIS_URL"))
@@ -268,8 +264,4 @@ func accountTranscationsController(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprintf(w, string(jsonString))
-}
-
-func getVersion() string {
-	return fmt.Sprintf("API version: v%v", version)
 }
