@@ -58,7 +58,7 @@ func mainViewController(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Println("Error while getting current directory: ", err)
-		responseWithError(w, http.StatusInternalServerError, err)
+		respondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -72,7 +72,7 @@ func latestBlockViewController(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Println("Error while getting latest block: ", err)
-		responseWithError(w, http.StatusInternalServerError, err)
+		respondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -81,7 +81,7 @@ func latestBlockViewController(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Println("Error while getting latest block: ", err)
-		responseWithError(w, http.StatusInternalServerError, err)
+		respondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -89,7 +89,7 @@ func latestBlockViewController(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Println("Error while getting current directory: ", err)
-		responseWithError(w, http.StatusInternalServerError, err)
+		respondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -103,7 +103,7 @@ func latestBlockController(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Println("Error while getting latest block: ", err)
-		responseWithError(w, http.StatusInternalServerError, err)
+		respondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -112,7 +112,7 @@ func latestBlockController(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Println("Error while getting latest block: ", err)
-		responseWithError(w, http.StatusInternalServerError, err)
+		respondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -120,7 +120,7 @@ func latestBlockController(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Println("Error while marshalling latest block: ", err)
-		responseWithError(w, http.StatusInternalServerError, err)
+		respondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -138,7 +138,7 @@ func blockController(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Println("Error while getting block #", vars["blockNumber"], err)
-		responseWithError(w, http.StatusInternalServerError, err)
+		respondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -146,7 +146,7 @@ func blockController(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Println("Error while marshalling block #", vars["blockNumber"], err)
-		responseWithError(w, http.StatusInternalServerError, err)
+		respondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -159,7 +159,7 @@ func transactionsController(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Println("Error while getting transactions list: ", err)
-		responseWithError(w, http.StatusInternalServerError, err)
+		respondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -179,7 +179,7 @@ func transactionsController(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Println("Error while marshalling transactions: ", err)
-		responseWithError(w, http.StatusInternalServerError, err)
+		respondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -196,7 +196,7 @@ func transactionController(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println("Error while getting transaction detail with hash: ",
 			vars["hash"], err)
-		responseWithError(w, http.StatusInternalServerError, err)
+		respondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -205,7 +205,7 @@ func transactionController(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println("Error while getting transaction detail with hash: ",
 			vars["hash"], err)
-		responseWithError(w, http.StatusInternalServerError, err)
+		respondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -213,7 +213,7 @@ func transactionController(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Println("Error while marshalling transaction detail: ", err)
-		responseWithError(w, http.StatusInternalServerError, err)
+		respondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -227,7 +227,7 @@ func accountsController(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Println("Error while getting accounts list: ", err)
-		responseWithError(w, http.StatusInternalServerError, err)
+		respondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -247,7 +247,7 @@ func accountsController(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Println("Error while marshalling accounts list: ", err)
-		responseWithError(w, http.StatusInternalServerError, err)
+		respondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -264,7 +264,7 @@ func accountController(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Println("Error while getting account by hash: ", vars["address"], err)
-		responseWithError(w, http.StatusInternalServerError, err)
+		respondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -272,7 +272,7 @@ func accountController(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Println("Error while marshalling account detail: ", err)
-		responseWithError(w, http.StatusInternalServerError, err)
+		respondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -290,7 +290,7 @@ func accountTranscationsController(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println("Error while getting account transactions: ", vars["address"],
 			err)
-		responseWithError(w, http.StatusInternalServerError, err)
+		respondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -298,7 +298,7 @@ func accountTranscationsController(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Println("Error while marshalling account transactions: ", err)
-		responseWithError(w, http.StatusInternalServerError, err)
+		respondWithError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -306,7 +306,7 @@ func accountTranscationsController(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, string(jsonString))
 }
 
-func responseWithError(w http.ResponseWriter, httpStatus int, err error) {
+func respondWithError(w http.ResponseWriter, httpStatus int, err error) {
 	w.WriteHeader(httpStatus)
 	fmt.Fprintf(w, err.Error())
 }
