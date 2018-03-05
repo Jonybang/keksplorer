@@ -69,10 +69,13 @@ async function checkConnections() {
 // })();
 
 (() => {
-    checkConnections().then(parse)
-        .catch(e => {
-            logger.log({level: 'error', message: `Failed to connect parity node`});
-        });
+    redisClient.on('ready', () => {
+      checkConnections()
+          .then(parse)
+          .catch(e => {
+              logger.log({level: 'error', message: `Failed to connect parity node`});
+          });
+    });
 
     function parse() {
         zrangebyscoreAsync('queue:blocks', 0, 0)
@@ -82,16 +85,13 @@ async function checkConnections() {
                 let promises = [];
 
                 for (let i = 0; i < res.length; i++) {
-                    promises = parseBlock(i);
+                    promises.push(parseBlock(res[i]));
                 }
 
                 return Promise.all(promises);
             })
             .catch(e => {
                 logger.log({level: 'error', message: `Error while parsing blocks: ${e}`});
-            })
-            .finally(() => {
-                return checkConnections();
             })
             .then(() => {
                 setTimeout(parse, 500);
@@ -111,6 +111,7 @@ async function parseBlock(blockId) {
         return;
     }
 
+    // TODO: handle null response (block)
     // multi request should go through block => txs => accounts parsing and commit changes at the end
     let multi = redisClient.multi();
 
