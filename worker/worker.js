@@ -171,9 +171,11 @@ async function parseTransaction(multi, txHash) {
     } else {
         multi.zadd(`block_tx:${tx.blockNumber}:${txHash}:list`, 1, tx.to);
         associateAccountWithTx(multi, tx.to, tx.blockNumber, tx.hash);
+        addAccountOrder(multi, tx.to, tx.blockNumber);
     }
 
     associateAccountWithTx(multi, tx.from, tx.blockNumber, tx.hash);
+    addAccountOrder(multi, tx.from, tx.blockNumber);
 }
 
 function associateTxWithBlock(multi, txHash, order, blockId) {
@@ -190,4 +192,11 @@ function associateAccountWithTx(multi, accountAddress, blockNumber, txHash) {
     assert.notEqual(txHash, null);
 
     multi.zadd(`account:${accountAddress}:tx_list`, blockNumber, txHash);
+}
+
+function addAccountOrder(multi, accountAddress, blockNumber) {
+    assert.notEqual(accountAddress, null);
+    assert.notEqual(blockNumber, null);
+
+    multi.zadd(`account:order`, blockNumber, accountAddress);
 }
