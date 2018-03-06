@@ -50,7 +50,7 @@ func main() {
 	r.HandleFunc("/api/accounts/{address}/transactions",
 		accountTransactionsController).Methods("GET")
 
-	staticDir := path.Join(getWorkDir(), "/public/assets/")
+	staticDir := path.Join(getWorkDir(), "./public/assets/")
 
 	// STATIC
 	r.PathPrefix("/assets").
@@ -69,7 +69,7 @@ func main() {
 // VIEW
 
 func mainViewController(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("/public/index.html"))
+	tmpl := template.Must(template.ParseFiles("./public/index.html"))
 
 	tmpl.Execute(w, "")
 }
@@ -92,7 +92,7 @@ func latestBlockViewController(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl := template.Must(template.ParseFiles("/public/latest_block.html"))
+	tmpl := template.Must(template.ParseFiles("./public/latest_block.html"))
 
 	tmpl.Execute(w, latestBlock)
 }
@@ -111,7 +111,7 @@ func blockViewController(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl := template.Must(template.ParseFiles("/public/block.html"))
+	tmpl := template.Must(template.ParseFiles("./public/block.html"))
 
 	tmpl.Execute(w, block)
 }
@@ -137,7 +137,7 @@ func transactionsViewController(w http.ResponseWriter, r *http.Request) {
 		transactions = append(transactions, tx...)
 	}
 
-	tmpl := template.Must(template.ParseFiles("/public/transactions.html"))
+	tmpl := template.Must(template.ParseFiles("./public/transactions.html"))
 
 	tmpl.Execute(w, transactions)
 }
@@ -174,7 +174,7 @@ func transactionViewController(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl := template.Must(template.ParseFiles("/public/transaction.html"))
+	tmpl := template.Must(template.ParseFiles("./public/transaction.html"))
 
 	tmpl.Execute(w, txDetail)
 }
