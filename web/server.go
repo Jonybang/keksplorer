@@ -172,7 +172,7 @@ func transactionViewController(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl := template.Must(template.ParseFiles("/public/transaction.html"))
+	tmpl := template.Must(template.ParseFiles("/web/public/transaction.html"))
 
 	tmpl.Execute(w, txDetail)
 }
