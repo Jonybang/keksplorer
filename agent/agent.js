@@ -1,111 +1,59 @@
 const Web3 = require('web3');
 const redis = require('redis');
+const winston = require('winston');
+const bluebird = require('bluebird');
 
 const WS_API_URL = process.env.WS_API_URL || "ws://127.0.0.1:8546";
 const REDIS_URL = process.env.REDIS_URL || "redis://127.0.0.1:6379";
-const RECONNECTION_MULTIPLIER = 1000;
 
 const redisClient = redis.createClient(REDIS_URL);
 
+const logger = winston.createLogger({
+  level: 'info',
+  transports: [
+    new winston.transports.File({filename: './logs/error.log', level: 'error'}),
+    new winston.transports.File({filename: './logs/combined.log'})
+  ]
+});
+
+if (process.env.NODE_ENV !== 'production') {
+  logger.add(new winston.transports.Console({
+    format: winston.format.simple()
+  }));
+}
+
+bluebird.promisifyAll(redis.RedisClient.prototype);
+bluebird.promisifyAll(redis.Multi.prototype);
+
 let web3 = new Web3(new Web3.providers.WebsocketProvider(WS_API_URL));
-let reconnectionTimeout = 5;
-let subscription = null;
-let reconnection = null;
 
 (() => {
   redisClient.on('error', (err) => {
     throw err;
   });
 
-  let length = 0;
-
-  getBlocksCountFromRedis().then((l) => {
-    length = l;
-  }).catch((err) => {
-    console.log(`Error while getting blocks count from redis: ${err}`);
-  });
-
-  if (length === 0) {
-    getAllBlocks();
-  } else {
-    getNewBlocks(length);
-    subscribeToHeaders();
-  }
+  getBlocks();
+  subscribeToNewBlocks();
 })();
 
-async function getWSProvider() {
-  return new Promise((resolve, reject) => {
-    resolve(new Web3.providers.WebsocketProvider(WS_API_URL));
-  });
-}
+async function getBlocks () {
+  logger.log({level: 'info', message: "Start grabbing blocks."});
 
-async function getWeb3(WSProvider) {
-  return new Promise((resolve, reject) => {
-    resolve(new Web3(WSProvider));
-  });
-}
+  let latestBlock = await redisClient.getAsync('latest_block');
 
-async function getBlocksCountFromRedis() {
-  return new Promise((resolve, reject) => {
-    redisClient.zcount('queue:blocks', '-inf', '+inf', (err, length) => {
-      if (err) reject(err);
+  if (!latestBlock) {
+    logger.log({level: 'info', message: "Latest block not found. Starting from 0."});
 
-      resolve(length);
-    });
-  });
-}
-
-
-async function addDataToRedis(args) {
-  return new Promise((resolve, reject) => {
-    redisClient.zadd(args, (err, res) => {
-      if (err) reject(err);
-
-      resolve(res);
-    });
-  });
-}
-
-async function getAllBlocks () {
-  console.log("Start grabbing");
-
-  let latestBlockNumber = 0;
-  let args = ['queue:blocks'];
-
-  for (let i = 0; ; i++) {
-    let block = await web3.eth.getBlock(i);
-
-    if (block === null) {
-      console.log(`Stop grabbing. Latest block number is ${i}`);
-
-      latestBlockNumber = i;
-
-      break;
-    }
-
-    args.push(0, block.number);
+    latestBlock = 0;
   }
-
-  try {
-    await addDataToRedis(args);
-  } catch(err) {
-    console.log(`Error while adding block to redis: ${err}`)
-  }
-
-  getNewBlocks(latestBlockNumber);
-  subscribeToHeaders();
-}
-
-async function getNewBlocks (latestBlockNumber) {
-  console.log("Start grabbing new blocks");
 
   let args = ['queue:blocks'];
 
-  for (let i = latestBlockNumber; ; i++) {
+  for (let i = latestBlock; ; i++) {
     let block = await web3.eth.getBlock(i);
 
     if (block === null) {
-      console.log(`Stop grabbing. Latest block number is ${i}`);
+      logger.log({level: 'info', message: `Stop grabbing. Latest block number is ${i}.`});
       break;
     }
 
@@ -115,66 +63,22 @@ async function getNewBlocks (latestBlockNumber) {
   if (args.length === 1) {
     return;
   }
-
-  try {
-    await addDataToRedis(args);
-  } catch(err) {
-    console.log(`Error while adding block to redis: ${err}`)
-  }
 }
 
-async function subscribeToHeaders() {
+async function subscribeToNewBlocks() {
   subscription = web3.eth.subscribe('newBlockHeaders', (err, res) => {
     if (err && err.reason) {
-      console.log(`Error while subscribe: ${err.reason}`);
-
-      try {
-        reconnect();
-      } catch (err) {
-        console.log(`Error while trying to reconnect: ${err}`);
-      }
+      logger.log({level: 'error', message: `Error while subscribe: ${err.reason}.`});
     }
   }).on('data', async (block) => {
-    let length = await getBlocksCountFromRedis();
-
-    if (length === 0) {
-      console.log(`Ops! Set 'queue:blocks' are empty. Adding all blocks...`);
-      return getAllBlocks();
-    }
-
     let args = ['queue:blocks', 0, block.number];
 
     try {
-      addDataToRedis(args);
-      console.log(`Added block #${block.number}`);
+      await redisClient.set('latest_block', block.number);
+      await redisClient.zadd(args);
+      logger.log({level: 'info', message: `Added block #${block.number}.`});
     } catch (err) {
-      console.log(`Error while adding block to redis: ${err}`);
+      logger.log({level: 'error', message: `Error while adding block to redis: ${err}.`});
     }
   });
-}
-
-async function reconnect() {
-  subscription = null;
-
-  reconnection = setInterval(async () => {
-    try {
-      let WSProvider = await getWSProvider();
-      web3 = await getWeb3(WSProvider);
-
-      let latestBlockNumber = await getBlocksCountFromRedis();
-
-      await getNewBlocks(latestBlockNumber);
-
-      subscribeToHeaders();
-      stopReconnection();
-    } catch (err) {
-      console.log(`Trying to reconnect...\n${err}`);
-    }
-  }, reconnectionTimeout * RECONNECTION_MULTIPLIER);
-}
-
-async function stopReconnection() {
-  clearInterval(reconnection);
-
-  console.log("Connection retrieved. Subscribe to blocks.")
 }
