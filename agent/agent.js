@@ -59,7 +59,7 @@ async function getBlocks() {
   }
 
   try {
-    await redisClient.zadd(args);
+    await redisClient.zaddAsync(args);
   } catch (err) {
     logger.log({level: 'error', message: `Error while adding block tu queue: ${err}`});
   }
