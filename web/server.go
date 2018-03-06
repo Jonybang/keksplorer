@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path"
 	"time"
 
 	"github.com/go-redis/redis"
@@ -49,7 +50,7 @@ func main() {
 	r.HandleFunc("/api/accounts/{address}/transactions",
 		accountTransactionsController).Methods("GET")
 
-	staticDir := getWorkDir() + "/web/public/assets/"
+	staticDir := path.Join(getWorkDir(), "/public/assets/")
 
 	// STATIC
 	r.PathPrefix("/assets").
@@ -68,9 +69,7 @@ func main() {
 // VIEW
 
 func mainViewController(w http.ResponseWriter, r *http.Request) {
-	dir := getWorkDir()
-
-	tmpl := template.Must(template.ParseFiles(dir + "/web/public/index.html"))
+	tmpl := template.Must(template.ParseFiles("/public/index.html"))
 
 	tmpl.Execute(w, "")
 }
@@ -93,9 +92,7 @@ func latestBlockViewController(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	dir := getWorkDir()
-
-	tmpl := template.Must(template.ParseFiles(dir + "/web/public/latest_block.html"))
+	tmpl := template.Must(template.ParseFiles("/public/latest_block.html"))
 
 	tmpl.Execute(w, latestBlock)
 }
@@ -114,9 +111,7 @@ func blockViewController(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	dir := getWorkDir()
-
-	tmpl := template.Must(template.ParseFiles(dir + "/web/public/block.html"))
+	tmpl := template.Must(template.ParseFiles("/public/block.html"))
 
 	tmpl.Execute(w, block)
 }
@@ -142,10 +137,7 @@ func transactionsViewController(w http.ResponseWriter, r *http.Request) {
 		transactions = append(transactions, tx...)
 	}
 
-	dir := getWorkDir()
-
-	tmpl := template.Must(template.ParseFiles(
-		dir + "/web/public/transactions.html"))
+	tmpl := template.Must(template.ParseFiles("/public/transactions.html"))
 
 	tmpl.Execute(w, transactions)
 }
@@ -182,10 +174,7 @@ func transactionViewController(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	dir := getWorkDir()
-
-	tmpl := template.Must(template.ParseFiles(
-		dir + "/web/public/transaction.html"))
+	tmpl := template.Must(template.ParseFiles("/web/public/transaction.html"))
 
 	tmpl.Execute(w, txDetail)
 }
