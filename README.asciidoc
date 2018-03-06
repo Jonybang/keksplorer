@@ -1,5 +1,6 @@
 = keksplorer
 
+NOTE: Check out the latest dev build at http://188.166.61.140:8080/
 
 == keksplorer-web
 Explorer web interface and api endpoints.
