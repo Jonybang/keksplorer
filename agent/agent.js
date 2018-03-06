@@ -36,7 +36,7 @@ let web3 = new Web3(new Web3.providers.WebsocketProvider(WS_API_URL));
   subscribeToNewBlocks();
 })();
 
-async function getBlocks () {
+async function getBlocks() {
   logger.log({level: 'info', message: "Start grabbing blocks."});
 
   let latestBlock = await redisClient.getAsync('latest_block');
@@ -48,16 +48,10 @@ async function getBlocks () {
   }
 
   let args = ['queue:blocks'];
+  let latestBlockInChain = await web3.eth.getBlock('latest');
 
-  for (let i = latestBlock; ; i++) {
-    let block = await web3.eth.getBlock(i);
-
-    if (block === null) {
-      logger.log({level: 'info', message: `Stop grabbing. Latest block number is ${i}.`});
-      break;
-    }
-
-    args.push(0, block.number.toString());
+  for (let i = latestBlock; i <= latestBlockInChain.number; i++) {
+    args.push(0, i);
   }
 
   if (args.length === 1) {
