@@ -118,6 +118,10 @@ async function parseBlock(blockId) {
     // multi request should go through block => txs => accounts parsing and commit changes at the end
     let multi = redisClient.multi();
 
+    for (let i = 0; i < block.transactions.length; i++) {
+        multi.zadd('transactions:order', block.timestamp, block.transactions[i]);
+    }
+
     let blockToStore = [
         "number", block.number,
         "validator", block.author || block.miner,
@@ -159,7 +163,7 @@ async function parseTransaction(multi, txHash) {
 
     let txToStore = [
         "from", tx.from,
-        "to", tx.to,
+        "to", tx.to || "",
         "value", tx.value,
         "gas", tx.gas,
         "gasPrice", tx.gasPrice,

@@ -11,3 +11,4 @@
 
 * **Sorted set** `queue:blocks` member: block_number, order: (0 - not parsed yet; 1 - parsed)
 * **Sorted set** `account:order` member: account, order: block_number
+* **Sorted set** `transactions:order` member: transaction_id, order: timestamp
