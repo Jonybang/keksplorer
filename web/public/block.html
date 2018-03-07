@@ -24,6 +24,12 @@
 		      <li class="nav-item">
 		        <a class="nav-link" href="/transactions">Transactions </a>
 		      </li>
+		      <li class="nav-item">
+		        <a class="nav-link" href="/blocks">Blocks </a>
+		      </li>
+		      <li class="nav-item">
+		        <a class="nav-link" href="/accounts">Accounts </a>
+		      </li>
 		    </ul>
 	      <form class="form-inline my-2 my-lg-0">
 		      <input class="form-control mr-sm-2" type="text" id="search-input" placeholder="Search by block number">
@@ -34,21 +40,42 @@
 
 	{{if .}}
 		<center>
-			<h1>Block #{{.number}}</h1>
+			<h1>Block #{{.block.number}}</h1>
 		</center>
 		<hr>
-		<p>Gas Used: {{.gasUsed}}</p>
-		<p>Hash: {{.hash}}</p>
-		<p>Number: {{.number}}</p>
-		<p>Size: {{.size}}</p>
-		<p>Timestamp: {{.timestamp}}</p>
-		<p>Validator: {{.validator}}</p>
+		<p>Gas Used: {{.block.gasUsed}}</p>
+		<p>Hash: {{.block.hash}}</p>
+		<p>Number: {{.block.number}}</p>
+		<p>Size: {{.block.size}}</p>
+		<p>Timestamp: {{.block.timestamp}}</p>
+		<p>Validator: <a href="/accounts/{{.block.validator}}">{{.block.validator}}</a></p>
 	{{else}}
 		<center>
 			<h1>There is not such block</h1>
 		</center>
 		<hr>
 	{{end}}
+
+		<table class="table table-striped">
+		  <thead>
+		    <tr>
+		      <th>TXID</th>
+		      <th>To</th>
+		      <th>From</th>
+		      <th>Value</th>
+		    </tr>
+		  </thead>
+		  <tbody>
+			{{range .txs}}
+			    <tr>
+			      <th scope="row"><a href="/transactions/{{.hash}}">{{.hash}}</a></th>
+			      <td><a href="/accounts/{{.to}}">{{.to}}</a></td>
+			      <td><a href="/accounts/{{.from}}">{{.from}}</a></td>
+			      <td>{{.value}}</td>
+			    </tr>
+	    {{end}}
+		  </tbody>
+		</table>
 	</div>
 
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
