@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>Transactions list</title>
+	<title>Blocks </title>
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
 </head>
@@ -21,13 +21,13 @@
 		      <li class="nav-item">
 		        <a class="nav-link" href="/latest_block">Latest Block </a>
 		      </li>
+		      <li class="nav-item">
+		        <a class="nav-link" href="/transactions">Transactions </a>
+		      </li>
 		      <li class="nav-item active">
-		        <a class="nav-link" href="/transactions">Transactions <span class="sr-only">(current)</span></a>
+		        <a class="nav-link" href="/blocks">Blocks <span class="sr-only">(current)</span></a>
 		      </li>
-					<li class="nav-item">
-		        <a class="nav-link" href="/blocks">Blocks</a>
-		      </li>
-					<li class="nav-item">
+		      <li class="nav-item">
 		        <a class="nav-link" href="/accounts">Accounts </a>
 		      </li>
 		    </ul>
@@ -37,26 +37,30 @@
 				</form>
 		  </div>
 		</nav>
-
-		<center>
-			<h1>Transactions list</h1>
-		</center>
-		<hr>
-		<table class="table table-striped">
+	
+	{{if .}}
+		<table class="table">
 		  <thead>
 		    <tr>
-		      <th>TXID</th>
+		      <th>Block Number</th>
+		      <th>Transactions</th>
 		    </tr>
 		  </thead>
 		  <tbody>
-				{{range .}}
+		  	{{range .}}
 			    <tr>
-				  <td><a href="/transactions/{{.}}">{{.}}</a></td>
+			      <th scope="row"><a href="/blocks/{{.number}}">{{.number}}</a></th>
+			      <th scope="row">{{.txs}}</th>
 			    </tr>
 		    {{end}}
 		  </tbody>
 		</table>
-
+	{{else}}
+		<center>
+			<h1>There is no blocks so far. Please wait a while...</h1>
+		</center>
+		<hr>
+	{{end}}
 	</div>
 
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
