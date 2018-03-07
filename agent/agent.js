@@ -50,6 +50,8 @@ async function getBlocks() {
   let args = ['queue:blocks'];
   let latestChainBlock = await web3.eth.getBlock('latest');
 
+  logger.log({level: 'info', message: `Latest redis block: ${latestRedisBlock}, latest chain block: ${latestChainBlock.number}`});
+
   for (let i = latestRedisBlock; i <= latestChainBlock.number; i++) {
     args.push(0, i);
   }
@@ -59,6 +61,8 @@ async function getBlocks() {
   }
 
   try {
+    logger.log({level: 'info', message: `Blocks to add: ${args}`});
+
     await redisClient.zaddAsync(args);
   } catch (err) {
     logger.log({level: 'error', message: `Error while adding block tu queue: ${err}`});
