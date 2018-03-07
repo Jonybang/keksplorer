@@ -159,6 +159,8 @@ async function parseTransaction(multi, txHash) {
 
     let txToStore = [
         "from", tx.from,
+        "to", tx.to,
+        "value", tx.value,
         "gas", tx.gas,
         "gasPrice", tx.gasPrice,
         "hash", tx.hash,
