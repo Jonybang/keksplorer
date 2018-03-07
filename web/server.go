@@ -8,7 +8,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"path"
 	"time"
 
 	"github.com/go-redis/redis"
@@ -50,11 +49,10 @@ func main() {
 	r.HandleFunc("/api/accounts/{address}/transactions",
 		accountTransactionsController).Methods("GET")
 
-	staticDir := path.Join(getWorkDir(), "/public/assets/")
-
 	// STATIC
 	r.PathPrefix("/assets").
-		Handler(http.StripPrefix("/assets", http.FileServer(http.Dir(staticDir))))
+		Handler(http.StripPrefix("/assets", http.FileServer(
+			http.Dir("./public/assets/"))))
 
 	srv := &http.Server{
 		Handler:      r,
@@ -69,7 +67,7 @@ func main() {
 // VIEW
 
 func mainViewController(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("/public/index.html"))
+	tmpl := template.Must(template.ParseFiles("./public/index.html"))
 
 	tmpl.Execute(w, "")
 }
@@ -92,7 +90,7 @@ func latestBlockViewController(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl := template.Must(template.ParseFiles("/public/latest_block.html"))
+	tmpl := template.Must(template.ParseFiles("./public/latest_block.html"))
 
 	tmpl.Execute(w, latestBlock)
 }
@@ -111,7 +109,7 @@ func blockViewController(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl := template.Must(template.ParseFiles("/public/block.html"))
+	tmpl := template.Must(template.ParseFiles("./public/block.html"))
 
 	tmpl.Execute(w, block)
 }
@@ -137,7 +135,7 @@ func transactionsViewController(w http.ResponseWriter, r *http.Request) {
 		transactions = append(transactions, tx...)
 	}
 
-	tmpl := template.Must(template.ParseFiles("/public/transactions.html"))
+	tmpl := template.Must(template.ParseFiles("./public/transactions.html"))
 
 	tmpl.Execute(w, transactions)
 }
@@ -174,7 +172,7 @@ func transactionViewController(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl := template.Must(template.ParseFiles("/public/transaction.html"))
+	tmpl := template.Must(template.ParseFiles("./public/transaction.html"))
 
 	tmpl.Execute(w, txDetail)
 }
@@ -402,14 +400,4 @@ func accountTransactionsController(w http.ResponseWriter, r *http.Request) {
 func respondWithError(w http.ResponseWriter, httpStatus int, err error) {
 	w.WriteHeader(httpStatus)
 	fmt.Fprintf(w, err.Error())
-}
-
-func getWorkDir() string {
-	dir, err := os.Getwd()
-
-	if err != nil {
-		log.Println("Error while trying to get work directory:", err)
-	}
-
-	return dir
 }
