@@ -10,7 +10,7 @@ apis = ["web3", "eth", "net", "parity", "traces", "rpc", "personal"]
 [websockets]
 interface = "0.0.0.0"
 hosts = ["all"]
-apis = ["web3", "eth", "net", "parity", "traces", "rpc", "personal"]
+apis = ["web3", "eth", "net", "parity", "traces", "rpc", "personal", "pubsub"]
 
 [network]
 reserved_peers = "/parity/config/bootnodes.txt"
