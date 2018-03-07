@@ -27,7 +27,7 @@ bluebird.promisifyAll(redis.Multi.prototype);
 
 let web3 = new Web3(new Web3.providers.WebsocketProvider(WS_API_URL));
 
-(() => {
+(async () => {
   redisClient.on('error', (err) => {
     throw err;
   });
@@ -39,18 +39,34 @@ let web3 = new Web3(new Web3.providers.WebsocketProvider(WS_API_URL));
 async function getBlocks() {
   logger.log({level: 'info', message: "Start grabbing blocks."});
 
-  let latestBlock = await redisClient.getAsync('latest_block');
+  let latestRedisBlock = await redisClient.getAsync('latest_block');
 
-  if (!latestBlock) {
+  if (!latestRedisBlock) {
     logger.log({level: 'info', message: "Latest block not found. Starting from 0."});
 
-    latestBlock = 0;
+    latestRedisBlock = 0;
   }
 
-  let args = ['queue:blocks'];
-  let latestBlockInChain = await web3.eth.getBlock('latest');
+  let latestChainBlock = await web3.eth.getBlock('latest');
 
-  for (let i = latestBlock; i <= latestBlockInChain.number; i++) {
+  logger.log({level: 'info', message: `Latest redis block: ${latestRedisBlock}, latest chain block: ${latestChainBlock.number}`});
+
+  const STEP = 100000;
+  let from = latestRedisBlock;
+  let to = ((latestRedisBlock + STEP) > latestChainBlock.number) ? latestChainBlock.number : latestRedisBlock + STEP;
+
+  while (from < latestChainBlock.number) {
+    logger.log({level: 'info', message: `from ${from}, to ${to}, latestChainBlock ${latestChainBlock.number}`});
+    await putBlockNumbersToQueue(from, to);
+    from = to;
+    to = ((to + STEP) > latestChainBlock.number) ? latestChainBlock.number : to + STEP;
+  }
+}
+
+async function putBlockNumbersToQueue(from, to) {
+  let args = ['queue:blocks'];
+
+  for (let i = from; i <= to; i++) {
     args.push(0, i);
   }
 
@@ -59,6 +75,8 @@ async function getBlocks() {
   }
 
   try {
+    logger.log({level: 'info', message: `Blocks to add: ${args[0]}...${args[args.length - 1]}`});
+
     await redisClient.zaddAsync(args);
   } catch (err) {
     logger.log({level: 'error', message: `Error while adding block tu queue: ${err}`});
@@ -66,16 +84,16 @@ async function getBlocks() {
 }
 
 async function subscribeToNewBlocks() {
-  subscription = web3.eth.subscribe('newBlockHeaders', (err, res) => {
-    if (err && err.reason) {
-      logger.log({level: 'error', message: `Error while subscribe: ${err.reason}.`});
+  web3.eth.subscribe('newBlockHeaders', (err, res) => {
+    if (err) {
+      logger.log({level: 'error', message: `Error while subscribe: ${err}.`});
     }
   }).on('data', async (block) => {
-    let args = ['queue:blocks', 0, block.number];
+      let args = ['queue:blocks', 0, block.number];
 
     try {
-      await redisClient.set('latest_block', block.number);
-      await redisClient.zadd(args);
+      await redisClient.setAsync('latest_block', block.number);
+      await redisClient.zaddAsync(args);
       logger.log({level: 'info', message: `Added block #${block.number}.`});
     } catch (err) {
       logger.log({level: 'error', message: `Error while adding block to redis: ${err}.`});
