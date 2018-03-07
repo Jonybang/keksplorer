@@ -16,6 +16,7 @@ const web3 = new Web3(process.env.JSON_RPC_API_URL, net);
 bluebird.promisifyAll(redis.Multi.prototype);
 
 const zrangebyscoreAsync = promisify(redisClient.zrangebyscore).bind(redisClient);
+// const zaddAsync = promisify(redisClient.zadd).bind(redisClient);
 
 Promise.prototype.finally = function (cb) {
     const res = () => this;
@@ -80,11 +81,13 @@ async function checkConnections() {
     function parse() {
         zrangebyscoreAsync('queue:blocks', 0, 0)
             .then((res) => {
-                logger.log({level: 'info', message: `Blocks to parse: ${res.length}`});
-
                 let promises = [];
 
-                for (let i = 0; i < res.length; i++) {
+                let len = (res.length > 10000) ? 10000 : res.length;
+
+                logger.log({level: 'info', message: `Blocks to parse: ${len} of ${res.length}`});
+
+                for (let i = 0; i < len; i++) {
                     promises.push(parseBlock(res[i]));
                 }
 
