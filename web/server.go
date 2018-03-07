@@ -8,7 +8,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"path"
 	"time"
 
 	"github.com/go-redis/redis"
@@ -50,11 +49,10 @@ func main() {
 	r.HandleFunc("/api/accounts/{address}/transactions",
 		accountTransactionsController).Methods("GET")
 
-	staticDir := path.Join(getWorkDir(), "./public/assets/")
-
 	// STATIC
 	r.PathPrefix("/assets").
-		Handler(http.StripPrefix("/assets", http.FileServer(http.Dir(staticDir))))
+		Handler(http.StripPrefix("/assets", http.FileServer(
+			http.Dir("./public/assets/"))))
 
 	srv := &http.Server{
 		Handler:      r,
@@ -402,14 +400,4 @@ func accountTransactionsController(w http.ResponseWriter, r *http.Request) {
 func respondWithError(w http.ResponseWriter, httpStatus int, err error) {
 	w.WriteHeader(httpStatus)
 	fmt.Fprintf(w, err.Error())
-}
-
-func getWorkDir() string {
-	dir, err := os.Getwd()
-
-	if err != nil {
-		log.Println("Error while trying to get work directory:", err)
-	}
-
-	return dir
 }
