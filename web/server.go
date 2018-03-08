@@ -133,7 +133,9 @@ func mainViewController(w http.ResponseWriter, r *http.Request) {
 		txs[i], txs[opp] = txs[opp], txs[i]
 	}
 
-	responseData["txs"] = txs[:5]
+	if len(txs) > 5 {
+		responseData["txs"] = txs[:5]
+	}
 
 	tmpl := template.Must(template.ParseFiles("./public/index.html"))
 

@@ -1,4 +1,5 @@
 const fs = require('fs');
+const path = require('path');
 const Web3 = require('web3');
 const redis = require('redis');
 const winston = require('winston');
@@ -43,7 +44,8 @@ async function subscribeToNewBlocks() {
   }).on('data', async (block) => {
     if (!recheckLaunched) {
       recheckLaunched = true;
-      redisClient.eval(fs.readFileSync('./agent/recheck.lua'), 1, block.number);
+
+      redisClient.eval(fs.readFileSync(path.join(__dirname, 'recheck.lua')), 1, block.number);
     }
 
     let args = ['queue:blocks', 0, block.number];
