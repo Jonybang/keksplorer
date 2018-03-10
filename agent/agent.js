@@ -9,6 +9,7 @@ const WS_API_URL = process.env.WS_API_URL || "ws://127.0.0.1:8546";
 const REDIS_URL = process.env.REDIS_URL || "redis://127.0.0.1:6379";
 
 const redisClient = redis.createClient(REDIS_URL);
+const recheckScript = fs.readFileSync(path.join(__dirname, 'recheck.lua'));
 
 const logger = winston.createLogger({
   level: 'info',
@@ -45,7 +46,7 @@ async function subscribeToNewBlocks() {
     if (!recheckLaunched) {
       recheckLaunched = true;
 
-      redisClient.eval(fs.readFileSync(path.join(__dirname, 'recheck.lua')), 1, block.number);
+      redisClient.eval(recheckScript, 1, block.number);
     }
 
     let args = ['queue:blocks', 0, block.number];
