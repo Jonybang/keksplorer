@@ -77,8 +77,9 @@ func mainViewController(w http.ResponseWriter, r *http.Request) {
 	blocks, err := getLatestBlocksByCount(5)
 
 	if err != nil {
-		tmpl := template.Must(template.ParseFiles("./public/blocks.html"))
-		tmpl.Execute(w, "")
+		tmpl := template.Must(template.ParseFiles("./public/index.tmpl",
+			"./public/templates/header.tmpl"))
+		tmpl.ExecuteTemplate(w, "main", "")
 
 		log.Println("Error while getting latest blocks: ", err)
 		return
@@ -116,20 +117,42 @@ func mainViewController(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	transactions := []map[string]string{}
+	for _, tx := range txs {
+		txKey, err := redisClient.Keys(fmt.Sprintf(
+			"block_tx:*:%v:detail", tx)).Result()
+
+		if err != nil {
+			log.Println("Error while getting key of transaction:", tx)
+			continue
+		}
+
+		txDetail, err := redisClient.HGetAll(txKey[0]).Result()
+
+		if err != nil {
+			log.Println("Error while getting transactions detail with hash:", tx)
+			continue
+		}
+
+		transactions = append(transactions, txDetail)
+	}
+
 	response["blocks"] = shortcutBlocks
-	response["txs"] = txs
+	response["txs"] = transactions
 
-	tmpl := template.Must(template.ParseFiles("./public/index.html"))
+	tmpl := template.Must(template.ParseFiles("./public/index.tmpl",
+		"./public/templates/header.tmpl"))
 
-	tmpl.Execute(w, response)
+	tmpl.ExecuteTemplate(w, "main", response)
 }
 
 func latestBlockViewController(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("./public/latest_block.html"))
+	tmpl := template.Must(template.ParseFiles("./public/latest_block.tmpl",
+		"./public/templates/header.tmpl"))
 	latestBlock, err := getLatestBlockData()
 
 	if len(latestBlock) == 0 {
-		tmpl.Execute(w, "")
+		tmpl.ExecuteTemplate(w, "latest_block", "")
 		return
 	}
 
@@ -138,15 +161,16 @@ func latestBlockViewController(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl.Execute(w, latestBlock)
+	tmpl.ExecuteTemplate(w, "latest_block", latestBlock)
 }
 
 func blocksViewController(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("./public/blocks.html"))
+	tmpl := template.Must(template.ParseFiles("./public/blocks.tmpl",
+		"./public/templates/header.tmpl"))
 	blocks, err := getBlocksData()
 
 	if len(blocks) == 0 {
-		tmpl.Execute(w, "")
+		tmpl.ExecuteTemplate(w, "blocks", "")
 		return
 	}
 
@@ -155,22 +179,22 @@ func blocksViewController(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl.Execute(w, blocks)
+	tmpl.ExecuteTemplate(w, "blocks", blocks)
 }
 
 func blockViewController(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(template.ParseFiles("./public/block.tmpl",
+		"./public/templates/header.tmpl"))
 	vars := mux.Vars(r)
 
 	block, err := getBlockData(vars)
 
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, err)
+		tmpl.ExecuteTemplate(w, "block", "")
 		return
 	}
 
-	tmpl := template.Must(template.ParseFiles("./public/block.html"))
-
-	tmpl.Execute(w, block)
+	tmpl.ExecuteTemplate(w, "block", block)
 }
 
 func transactionsViewController(w http.ResponseWriter, r *http.Request) {
@@ -181,9 +205,10 @@ func transactionsViewController(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl := template.Must(template.ParseFiles("./public/transactions.html"))
+	tmpl := template.Must(template.ParseFiles("./public/transactions.tmpl",
+		"./public/templates/header.tmpl"))
 
-	tmpl.Execute(w, transactions)
+	tmpl.ExecuteTemplate(w, "transactions", transactions)
 }
 
 func transactionViewController(w http.ResponseWriter, r *http.Request) {
@@ -196,9 +221,10 @@ func transactionViewController(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl := template.Must(template.ParseFiles("./public/transaction.html"))
+	tmpl := template.Must(template.ParseFiles("./public/transaction.tmpl",
+		"./public/templates/header.tmpl"))
 
-	tmpl.Execute(w, txDetail)
+	tmpl.ExecuteTemplate(w, "transaction", txDetail)
 }
 
 func accountsViewController(w http.ResponseWriter, r *http.Request) {
@@ -209,9 +235,10 @@ func accountsViewController(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl := template.Must(template.ParseFiles("./public/accounts.html"))
+	tmpl := template.Must(template.ParseFiles("./public/accounts.tmpl",
+		"./public/templates/header.tmpl"))
 
-	tmpl.Execute(w, accounts)
+	tmpl.ExecuteTemplate(w, "accounts", accounts)
 }
 
 func accountViewController(w http.ResponseWriter, r *http.Request) {
@@ -224,9 +251,10 @@ func accountViewController(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl := template.Must(template.ParseFiles("./public/account.html"))
+	tmpl := template.Must(template.ParseFiles("./public/account.tmpl",
+		"./public/templates/header.tmpl"))
 
-	tmpl.Execute(w, account)
+	tmpl.ExecuteTemplate(w, "account", account)
 }
 
 // API
@@ -275,6 +303,12 @@ func blockController(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
 	block, err := getBlockData(vars)
+
+	if err != nil {
+		log.Println("Error while getting block data #", vars["blockNumber"], err)
+		respondWithError(w, http.StatusInternalServerError, err)
+		return
+	}
 
 	jsonString, err := json.Marshal(block)
 
@@ -582,24 +616,39 @@ func getBlockData(vars map[string]string) (map[string]interface{}, error) {
 	return responseData, nil
 }
 
-func getTransactionsData() ([]string, error) {
-	keys, err := redisClient.Keys("block:*:tx_list").Result()
+func getTransactionsData() ([]map[string]string, error) {
+	txs, err := redisClient.ZRevRangeByScore("transactions:order",
+		redis.ZRangeBy{
+			Min:    "-inf",
+			Max:    "+inf",
+			Offset: int64(0),
+			Count:  int64(100),
+		}).Result()
 
 	if err != nil {
-		return []string{}, fmt.Errorf("Error while getting transactions list: %v",
+		return []map[string]string{}, fmt.Errorf("Error while getting transactions:order %v",
 			err)
 	}
 
-	transactions := []string{}
-	for _, key := range keys {
-		tx, err := redisClient.ZRange(key, int64(0), int64(-1)).Result()
+	transactions := []map[string]string{}
+	for _, tx := range txs {
+		txKey, err := redisClient.Keys(fmt.Sprintf(
+			"block_tx:*:%v:detail", tx)).Result()
 
 		if err != nil {
-			log.Println("Error while getting transaction list: ", err)
+			log.Println("Error while getting key of transaction:", tx)
 			continue
 		}
 
-		transactions = append(transactions, tx...)
+		txDetail, err := redisClient.HGetAll(txKey[0]).Result()
+
+		log.Println(txDetail)
+		if err != nil {
+			log.Println("Error while getting transactions detail with hash:", tx)
+			continue
+		}
+
+		transactions = append(transactions, txDetail)
 	}
 
 	return transactions, nil
@@ -657,9 +706,19 @@ func getAccountData(vars map[string]string) (map[string]interface{}, error) {
 			vars["address"], err)
 	}
 
+	balance, err := redisClient.HGetAll(
+		fmt.Sprintf("account:%v:detail", vars["address"])).Result()
+
+	if err != nil {
+		return map[string]interface{}{}, fmt.Errorf(
+			"Error while getting balance of address %v. Error %v",
+			balance["address"], err)
+	}
+
 	responseData := make(map[string]interface{})
 
 	responseData["address"] = vars["address"]
+	responseData["balance"] = balance["balance"]
 	responseData["txs"] = accountTxs
 
 	return responseData, nil

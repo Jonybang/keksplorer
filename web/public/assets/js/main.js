@@ -1,4 +1,4 @@
-$(function() {
+$(document).ready(function() {
 	$("#search-button").click(function(event) {
 		var redirectUrl = location.protocol
 			+ "//"
@@ -10,4 +10,10 @@ $(function() {
 
 		event.preventDefault();
 	});
+
+	makeShorter();
 });
+
+function makeShorter() {
+	$(".shortcut").text($(".shortcut").text().substring(0, 12) + "...");
+}
