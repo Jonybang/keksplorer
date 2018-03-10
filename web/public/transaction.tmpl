@@ -1,0 +1,36 @@
+{{define "transaction"}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Latest block</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+</head>
+<body>
+	<div class="container">
+		{{template "header" .}}
+
+		<center>
+			<h1>Transaction</h1>
+			<h6>txid: {{.hash}}</h6>
+		</center>
+		<hr>
+
+		<p>From: <a href="/accounts/{{.from}}">{{.from}}</a></p>
+		<p>To: <a href="/accounts/{{.to}}">{{.to}}</a></p>
+		<p>Gas: {{.gas}}</p>
+		<p>GasPrice: {{.gasPrice}}</p>
+		<p>Hash: {{.hash}}</p>
+		<p>Input: 
+			<textarea class="form-control" name="" id="" cols="100" rows="1">{{.input}}</textarea>
+		</p>
+		<p>Nonce: {{.nonce}}</p>
+	</div>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="/assets/js/main.js"></script>
+
+</body>
+</html>
+{{end}}

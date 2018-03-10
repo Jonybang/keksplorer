@@ -1,0 +1,76 @@
+{{define "main"}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Welcome</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+</head>
+<body>
+	<div class="container">
+		{{template "header" .}}
+
+		<center>
+			<h1>keksplorer</h1>
+		</center>
+		<hr>
+
+		{{if .}}
+		<div class="row">
+		  <div class="col-6">
+		  <h2>Recent blocks</h2>
+			<table class="table">
+			  <thead>
+			    <tr>
+			      <th>Block Number</th>
+			      <th>Transactions</th>
+			    </tr>
+			  </thead>
+			  <tbody>
+					{{range .blocks}}
+				    <tr>
+				      <th scope="row"><a href="/blocks/{{.number}}">{{.number}}</a></th>
+				      <th scope="row">{{.txs}}</th>
+				    </tr>
+			    {{end}}
+			  </tbody>
+			</table>
+		  </div>
+		  <div class="col-6">
+			<h2>Recent transactions</h2>
+			<table class="table">
+			  <thead>
+			    <tr>
+			      <th>TXID</th>
+			      <th>From</th>
+			      <th>To</th>
+			      <th>Value</th>
+			    </tr>
+			  </thead>
+			  <tbody>
+				{{range .txs}}
+				    <tr>
+				      <th scope="row"><a href="/transactions/{{.hash}}" class="shortcut">{{.hash}}</a></th>
+				      <th scope="row"><a href="/accounts/{{.from}}" class="shortcut">{{.from}}</a></th>
+				      <th scope="row"><a href="/accounts/{{.to}}" class="shortcut">{{.to}}</a></th>
+				      <th scope="row">{{.value}}</th>
+				    </tr>
+			    {{end}}
+			  </tbody>
+			</table>
+		  </div>
+		</div>
+		{{else}}
+			<center>
+				<p>There is no such blocks or transactions. Please wait a while...</p>
+			</center>
+		{{end}}
+	</div>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="/assets/js/main.js"></script>
+
+</body>
+</html>
+{{end}}

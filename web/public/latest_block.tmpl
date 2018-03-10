@@ -1,0 +1,59 @@
+{{define "latest_block"}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Latest block</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+</head>
+<body>
+	<div class="container">
+		{{template "header" .}}
+
+		<center>
+			<h1>Latest block</h1>
+		</center>
+		<hr>
+		{{if .}}
+		<p>Gas Used: {{.block.gasUsed}}</p>
+		<p>Hash: {{.block.hash}}</p>
+		<p>Number: {{.block.number}}</p>
+		<p>Size: {{.block.size}}</p>
+		<p>Timestamp: {{.block.timestamp}}</p>
+		<p>Validator: <a href="/accounts/{{.block.validator}}">{{.block.validator}}</a></p>
+
+		<table class="table table-striped">
+		  <thead>
+		    <tr>
+		      <th>TXID</th>
+		      <th>To</th>
+		      <th>From</th>
+		      <th>Value</th>
+		    </tr>
+		  </thead>
+		  <tbody>
+				{{range .txs}}
+			    <tr>
+			      <th scope="row"><a href="/transactions/{{.hash}}" class="shortcut">{{.hash}}</a></th>
+			      <td><a href="/accounts/{{.to}}" class="shortcut">{{.to}}</a></td>
+			      <td><a href="/accounts/{{.from}}" class="shortcut">{{.from}}</a></td>
+			      <td>{{.value}}</td>
+			    </tr>
+		    {{end}}
+		  </tbody>
+		</table>
+
+		{{else}}
+			<center>
+				<p>There is no such blocks or transactions. Please wait a while...</p>
+			</center>
+		{{end}}
+	</div>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="/assets/js/main.js"></script>
+
+</body>
+</html>
+{{end}}
