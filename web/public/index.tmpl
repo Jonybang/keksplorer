@@ -16,7 +16,7 @@
 		</center>
 		<hr>
 
-		{{if .}}
+		{{if .blocks}}
 		<div class="row">
 		  <div class="col-6">
 		  <h2>Recent blocks</h2>
@@ -28,7 +28,7 @@
 			    </tr>
 			  </thead>
 			  <tbody>
-					{{range .blocks}}
+				{{range .blocks}}
 				    <tr>
 				      <th scope="row"><a href="/blocks/{{.number}}">{{.number}}</a></th>
 				      <th scope="row">{{.txs}}</th>
@@ -65,6 +65,19 @@
 			<center>
 				<p>There is no such blocks or transactions. Please wait a while...</p>
 			</center>
+			<div class="row">
+		 		<div class="col-12">
+		 			<center>
+			 			<p>
+			 				{{.percentLoaded}}% of blocks is loaded
+			 			</p>
+			 			<div class="progress">
+							<div class="progress-bar" role="progressbar" style="width: {{.percentLoaded}}%" aria-valuenow="{{.percentLoaded}}" aria-valuemin="0" aria-valuemax="100">
+							</div>
+						</div>
+		 			</center>
+		 		</div>
+		 	</div>
 		{{end}}
 	</div>
 
