@@ -116,9 +116,10 @@ async function parseBlock(blockId) {
         return;
     }
 
+    if (block === null) return;
     // TODO: handle null response (block)
     // multi request should go through block => txs => accounts parsing and commit changes at the end
-    // let multi = redisClient.multi();
+    let multi = redisClient.multi();
 
     if (block && block.transactions) {
       for (let i = 0; i < block.transactions.length; i++) {
@@ -193,7 +194,6 @@ async function parseTransaction(multi, txHash) {
 }
 
 async function parseAccounts() {
-  let multi = redisClient.multi();
   let accounts;
 
   try {
@@ -208,7 +208,7 @@ async function parseAccounts() {
     balance = await web3.utils.fromWei(balance, "ether");
 
     try {
-      addAccountDetail(multi, accounts[i], balance);
+      addAccountDetail(accounts[i], balance);
     } catch (err) {
       console.log(err);
     }
@@ -238,7 +238,7 @@ function addAccountOrder(multi, accountAddress, blockNumber) {
     multi.zadd(`account:order`, blockNumber, accountAddress);
 }
 
-function addAccountDetail(multi, accountAddress, balance) {
+function addAccountDetail(accountAddress, balance) {
   assert.notEqual(accountAddress, null);
   assert.notEqual(balance, null);
 
