@@ -91,8 +91,6 @@ async function checkConnections() {
                     promises.push(parseBlock(res[i]));
                 }
 
-                parseAccounts();
-
                 return Promise.all(promises);
             })
             .catch(e => {
@@ -116,9 +114,13 @@ async function parseBlock(blockId) {
         return;
     }
 
-    // TODO: handle null response (block)
+    if (block === null) {
+      logger.log({level: 'error', message: `Null block by number ${blockId}. Skipping...`});
+      return;
+    }
+
     // multi request should go through block => txs => accounts parsing and commit changes at the end
-    // let multi = redisClient.multi();
+    let multi = redisClient.multi();
 
     if (block && block.transactions) {
       for (let i = 0; i < block.transactions.length; i++) {
@@ -192,29 +194,6 @@ async function parseTransaction(multi, txHash) {
     addAccountOrder(multi, tx.from, tx.blockNumber);
 }
 
-async function parseAccounts() {
-  let multi = redisClient.multi();
-  let accounts;
-
-  try {
-    accounts = await web3.eth.getAccounts();
-  } catch (err) {
-    logger.log({level: 'error', message: `Error while getting accounts list: ${err}`})
-  }
-
-  for (let i = 0; i < accounts.length; i++) {
-    let balance = await web3.eth.getBalance(accounts[i]);
-
-    balance = await web3.utils.fromWei(balance, "ether");
-
-    try {
-      addAccountDetail(multi, accounts[i], balance);
-    } catch (err) {
-      console.log(err);
-    }
-  }
-}
-
 function associateTxWithBlock(multi, txHash, order, blockId) {
     assert.notEqual(txHash, null);
     assert.notEqual(order, null);
@@ -236,15 +215,4 @@ function addAccountOrder(multi, accountAddress, blockNumber) {
     assert.notEqual(blockNumber, null);
 
     multi.zadd(`account:order`, blockNumber, accountAddress);
-}
-
-function addAccountDetail(multi, accountAddress, balance) {
-  assert.notEqual(accountAddress, null);
-  assert.notEqual(balance, null);
-
-  let detailsToStore = [
-    "balance", balance
-  ];
-
-  redisClient.hset(`account:${accountAddress}:detail`, ...detailsToStore);
 }
