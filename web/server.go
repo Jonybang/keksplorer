@@ -73,15 +73,53 @@ func main() {
 
 func mainViewController(w http.ResponseWriter, r *http.Request) {
 	response := make(map[string]interface{})
+	tmpl := template.Must(template.ParseFiles("./public/index.tmpl",
+		"./public/templates/header.tmpl"))
 
 	blocks, err := getLatestBlocksByCount(5)
+	log.Println(blocks)
 
 	if err != nil {
-		tmpl := template.Must(template.ParseFiles("./public/index.tmpl",
-			"./public/templates/header.tmpl"))
 		tmpl.ExecuteTemplate(w, "main", "")
 
 		log.Println("Error while getting latest blocks: ", err)
+		return
+	}
+
+	if len(blocks) == 0 {
+		countBlocks, err := redisClient.Keys("block:*:detail").Result()
+		if err != nil {
+			tmpl.ExecuteTemplate(w, "main", "")
+
+			log.Println("Error while getting count of blocks: ", err)
+			return
+		}
+
+		latestBlock, err := redisClient.Get("latest_block").Result()
+		if err != nil {
+			tmpl.ExecuteTemplate(w, "main", "")
+
+			log.Println("Error while getting latest block: ", err)
+			return
+		}
+
+		latestBlockNumber, err := strconv.Atoi(latestBlock)
+
+		if err != nil {
+			tmpl.ExecuteTemplate(w, "main", "")
+
+			log.Println("Error while converting: ", err)
+			return
+		}
+
+		progress := make(map[string]interface{})
+
+		percentLoaded := float32(len(countBlocks)) /
+			float32(latestBlockNumber) * float32(100)
+
+		progress["percentLoaded"] = int(percentLoaded)
+
+		tmpl.ExecuteTemplate(w, "main", progress)
 		return
 	}
 
@@ -139,9 +177,6 @@ func mainViewController(w http.ResponseWriter, r *http.Request) {
 
 	response["blocks"] = shortcutBlocks
 	response["txs"] = transactions
-
-	tmpl := template.Must(template.ParseFiles("./public/index.tmpl",
-		"./public/templates/header.tmpl"))
 
 	tmpl.ExecuteTemplate(w, "main", response)
 }
@@ -431,6 +466,11 @@ func getLatestBlocksByCount(count int) ([]map[string]string, error) {
 			continue
 		}
 
+		if len(block) == 0 {
+			log.Println("Block", i, "is empty")
+			continue
+		}
+
 		blocks = append(blocks, block)
 	}
 
@@ -642,7 +682,6 @@ func getTransactionsData() ([]map[string]string, error) {
 
 		txDetail, err := redisClient.HGetAll(txKey[0]).Result()
 
-		log.Println(txDetail)
 		if err != nil {
 			log.Println("Error while getting transactions detail with hash:", tx)
 			continue

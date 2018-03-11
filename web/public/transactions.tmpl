@@ -12,7 +12,7 @@
 		{{template "header" .}}
 		
 		<center>
-			<h1>Latest block</h1>
+			<h1>Transactions</h1>
 		</center>
 		<hr>
 		{{if .}}
@@ -28,9 +28,9 @@
 		  <tbody>
 				{{range .}}
 			    <tr>
-				  <td><a href="/transactions/{{.}}" class="shortcut">{{.hash}}</a></td>
-				  <td><a href="/accounts/{{.}}" class="shortcut">{{.from}}</a></td>
-				  <td><a href="/accounts/{{.}}" class="shortcut">{{.to}}</a></td>
+				  <td><a href="/transactions/{{.hash}}" class="shortcut">{{.hash}}</a></td>
+				  <td><a href="/accounts/{{.from}}" class="shortcut">{{.from}}</a></td>
+				  <td><a href="/accounts/{{.to}}" class="shortcut">{{.to}}</a></td>
 				  <td>{{.value}}</td>
 			    </tr>
 		    {{end}}
