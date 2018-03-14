@@ -16,12 +16,12 @@
 		</center>
 		<hr>
 		{{if .}}
-		<p>Gas Used: {{.block.gasUsed}}</p>
-		<p>Hash: {{.block.hash}}</p>
-		<p>Number: {{.block.number}}</p>
-		<p>Size: {{.block.size}}</p>
-		<p>Timestamp: {{.block.timestamp}}</p>
-		<p>Validator: <a href="/accounts/{{.block.validator}}">{{.block.validator}}</a></p>
+		<p>Gas Used: {{.GasUsed}}</p>
+		<p>Hash: {{.Hash}}</p>
+		<p>Number: {{.Number}}</p>
+		<p>Size: {{.Size}}</p>
+		<p>Timestamp: {{.Timestamp}}</p>
+		<p>Validator: <a href="/accounts/{{.Validator}}">{{.Validator}}</a></p>
 
 		<table class="table table-striped">
 		  <thead>
@@ -33,12 +33,12 @@
 		    </tr>
 		  </thead>
 		  <tbody>
-				{{range .txs}}
+				{{range .Txs}}
 			    <tr>
-			      <th scope="row"><a href="/transactions/{{.hash}}" class="shortcut">{{.hash}}</a></th>
-			      <td><a href="/accounts/{{.to}}" class="shortcut">{{.to}}</a></td>
-			      <td><a href="/accounts/{{.from}}" class="shortcut">{{.from}}</a></td>
-			      <td>{{.value}}</td>
+			      <th scope="row"><a href="/transactions/{{.Hash}}" class="shortcut">{{.Hash}}</a></th>
+			      <td><a href="/accounts/{{.To}}" class="shortcut">{{.To}}</a></td>
+			      <td><a href="/accounts/{{.From}}" class="shortcut">{{.From}}</a></td>
+			      <td>{{.Value}}</td>
 			    </tr>
 		    {{end}}
 		  </tbody>

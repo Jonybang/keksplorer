@@ -1,5 +1,6 @@
 console.log('REDIS_URL', process.env.REDIS_URL);
 console.log('JSON_RPC_API_URL', process.env.JSON_RPC_API_URL);
+const HOME = process.env.HOME;
 
 const {promisify} = require('util');
 
@@ -166,16 +167,25 @@ async function parseTransaction(multi, txHash) {
     logger.log({level: 'info', message: `Parsing tx #${txHash}`});
 
     let tx = await web3.eth.getTransaction(txHash);
+    let value;
+
+    if (typeof parseInt(tx.value) === "number") {
+        value = web3.utils.fromWei(tx.value);
+        value = cutNumber(+value);
+    } else {
+        value = tx.value;
+    }
 
     let txToStore = [
         "from", tx.from,
         "to", tx.to || "",
-        "value", tx.value,
+        "value", value,
         "gas", tx.gas,
         "gasPrice", tx.gasPrice,
         "hash", tx.hash,
         "input", tx.input,
         "nonce", tx.nonce,
+        "blockNumber", tx.blockNumber,
     ];
 
     multi.hset(`block_tx:${tx.blockNumber}:${txHash}:detail`, ...txToStore);
@@ -215,4 +225,13 @@ function addAccountOrder(multi, accountAddress, blockNumber) {
     assert.notEqual(blockNumber, null);
 
     multi.zadd(`account:order`, blockNumber, accountAddress);
+}
+
+function cutNumber(number) {
+    if (number.toString().split(".").length === 2) {
+        if (number.toString().split(".")[1].length > 9) {
+            return number.toFixed(9);
+        }
+    }
+    return number;
 }

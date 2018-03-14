@@ -5,10 +5,12 @@ import (
 	"errors"
 	"fmt"
 	"html/template"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/go-redis/redis"
@@ -19,7 +21,18 @@ const version = "0.1.0"
 
 var redisClient *redis.Client
 
+var transactionsScript []byte
+var blocksScript []byte
+var accountScript []byte
+
 func main() {
+	err := loadScripts()
+
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
 	r := mux.NewRouter()
 
 	urlOpts, err := redis.ParseURL(os.Getenv("REDIS_URL"))
@@ -29,14 +42,14 @@ func main() {
 	}
 
 	redisClient = redis.NewClient(&redis.Options{
-		Addr:     urlOpts.Addr,
-		Password: "",
-		DB:       0,
+		Addr:        urlOpts.Addr,
+		Password:    "",
+		DB:          0,
+		ReadTimeout: time.Second * 10,
 	})
 
 	// VIEW
 	r.HandleFunc("/", mainViewController).Methods("GET")
-	r.HandleFunc("/latest_block", latestBlockViewController).Methods("GET")
 	r.HandleFunc("/blocks", blocksViewController).Methods("GET")
 	r.HandleFunc("/blocks/{blockNumber}", blockViewController).Methods("GET")
 	r.HandleFunc("/transactions", transactionsViewController).Methods("GET")
@@ -76,17 +89,9 @@ func mainViewController(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles("./public/index.tmpl",
 		"./public/templates/header.tmpl"))
 
-	blocks, err := getLatestBlocksByCount(5)
-	log.Println(blocks)
+	blocks, err := getBlocksData(5)
 
-	if err != nil {
-		tmpl.ExecuteTemplate(w, "main", "")
-
-		log.Println("Error while getting latest blocks: ", err)
-		return
-	}
-
-	if len(blocks) == 0 {
+	if len(blocks) == 0 && err == nil {
 		countBlocks, err := redisClient.Keys("block:*:detail").Result()
 		if err != nil {
 			tmpl.ExecuteTemplate(w, "main", "")
@@ -123,31 +128,14 @@ func mainViewController(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	shortcutBlocks := []map[string]string{}
-	for _, block := range blocks {
-		blockNumber, err := strconv.Atoi(block["number"])
+	if err != nil {
+		tmpl.ExecuteTemplate(w, "main", "")
 
-		if err != nil {
-			log.Println(err)
-			continue
-		}
-
-		txs, err := getBlockTransactions(blockNumber)
-
-		if err != nil {
-			log.Println(err)
-			continue
-		}
-
-		shortcutBlockInfo := make(map[string]string)
-
-		shortcutBlockInfo["number"] = block["number"]
-		shortcutBlockInfo["txs"] = strconv.Itoa(len(txs))
-
-		shortcutBlocks = append(shortcutBlocks, shortcutBlockInfo)
+		log.Println("Error while getting latest blocks: ", err)
+		return
 	}
 
-	txs, err := getLatestTransactionsByCount(5)
+	txs, err := getTransactionsData(5)
 
 	if err != nil {
 		log.Println(err)
@@ -155,55 +143,18 @@ func mainViewController(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	transactions := []map[string]string{}
-	for _, tx := range txs {
-		txKey, err := redisClient.Keys(fmt.Sprintf(
-			"block_tx:*:%v:detail", tx)).Result()
-
-		if err != nil {
-			log.Println("Error while getting key of transaction:", tx)
-			continue
-		}
-
-		txDetail, err := redisClient.HGetAll(txKey[0]).Result()
-
-		if err != nil {
-			log.Println("Error while getting transactions detail with hash:", tx)
-			continue
-		}
-
-		transactions = append(transactions, txDetail)
-	}
-
-	response["blocks"] = shortcutBlocks
-	response["txs"] = transactions
+	response["blocks"] = blocks
+	response["txs"] = txs
 
 	tmpl.ExecuteTemplate(w, "main", response)
-}
-
-func latestBlockViewController(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("./public/latest_block.tmpl",
-		"./public/templates/header.tmpl"))
-	latestBlock, err := getLatestBlockData()
-
-	if len(latestBlock) == 0 {
-		tmpl.ExecuteTemplate(w, "latest_block", "")
-		return
-	}
-
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, err)
-		return
-	}
-
-	tmpl.ExecuteTemplate(w, "latest_block", latestBlock)
 }
 
 func blocksViewController(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles("./public/blocks.tmpl",
 		"./public/templates/header.tmpl"))
-	blocks, err := getBlocksData()
+	blocks, err := getBlocksData(50)
 
+	log.Println(blocks)
 	if len(blocks) == 0 {
 		tmpl.ExecuteTemplate(w, "blocks", "")
 		return
@@ -233,7 +184,7 @@ func blockViewController(w http.ResponseWriter, r *http.Request) {
 }
 
 func transactionsViewController(w http.ResponseWriter, r *http.Request) {
-	transactions, err := getTransactionsData()
+	transactions, err := getTransactionsData(50)
 
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err)
@@ -315,7 +266,7 @@ func latestBlockController(w http.ResponseWriter, r *http.Request) {
 }
 
 func blocksController(w http.ResponseWriter, r *http.Request) {
-	blocks, err := getBlocksData()
+	blocks, err := getBlocksData(50)
 
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err)
@@ -358,7 +309,7 @@ func blockController(w http.ResponseWriter, r *http.Request) {
 }
 
 func transactionsController(w http.ResponseWriter, r *http.Request) {
-	transactions, err := getTransactionsData()
+	transactions, err := getTransactionsData(50)
 
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err)
@@ -448,35 +399,6 @@ func respondWithError(w http.ResponseWriter, httpStatus int, err error) {
 	fmt.Fprintf(w, err.Error())
 }
 
-func getLatestBlocksByCount(count int) ([]map[string]string, error) {
-	latestBlock, err := getLatestBlockNumber()
-
-	if err != nil {
-		return []map[string]string{}, err
-	}
-
-	blocks := []map[string]string{}
-
-	for i := latestBlock; i > latestBlock-count; i-- {
-		block, err := redisClient.HGetAll(
-			fmt.Sprintf("block:%v:detail", i)).Result()
-
-		if err != nil {
-			log.Println("Error while getting block #", i)
-			continue
-		}
-
-		if len(block) == 0 {
-			log.Println("Block", i, "is empty")
-			continue
-		}
-
-		blocks = append(blocks, block)
-	}
-
-	return blocks, nil
-}
-
 func getLatestBlockNumber() (int, error) {
 	latestBlock, err := redisClient.Get("latest_block").Result()
 
@@ -493,22 +415,6 @@ func getLatestBlockNumber() (int, error) {
 	return latestBlockNumber, nil
 }
 
-func getLatestTransactionsByCount(count int) ([]string, error) {
-	txs, err := redisClient.ZRevRangeByScore("transactions:order",
-		redis.ZRangeBy{
-			Min:    "-inf",
-			Max:    "+inf",
-			Offset: int64(0),
-			Count:  int64(count),
-		}).Result()
-
-	if err != nil {
-		return []string{}, fmt.Errorf("Error while getting transactions: %v", err)
-	}
-
-	return txs, nil
-}
-
 func getBlockTransactions(blockNumber int) ([]string, error) {
 	txs, err := redisClient.ZRange(
 		fmt.Sprintf("block:%v:tx_list", blockNumber), int64(0), int64(-1)).
@@ -520,6 +426,32 @@ func getBlockTransactions(blockNumber int) ([]string, error) {
 	}
 
 	return txs, nil
+}
+
+func getBlockByTransaction(tx string) (map[string]string, error) {
+	keys, err := redisClient.Keys(fmt.Sprintf("block_tx:*:%v:detail", tx)).Result()
+
+	if err != nil {
+		return map[string]string{}, fmt.Errorf(
+			"Error while getting keys by hash %v. Error: %v", tx, err)
+	}
+
+	if len(keys) == 0 {
+		return map[string]string{}, fmt.Errorf(
+			"Can't find any keys with txid %v", tx)
+	}
+
+	blockNumber := strings.Split(keys[0], ":")[1]
+
+	block, err := redisClient.HGetAll(fmt.Sprintf(
+		"block:%v:detail", blockNumber)).Result()
+
+	if err != nil {
+		return map[string]string{}, fmt.Errorf(
+			"Error while getting block by key %v. Error: %v", keys[0], err)
+	}
+
+	return block, nil
 }
 
 func getBlockDetailWithTxsByNumber(blockNumber int) (
@@ -561,83 +493,45 @@ func getBlockDetailWithTxsByNumber(blockNumber int) (
 	return responseData, nil
 }
 
-func getLatestBlockData() (map[string]interface{}, error) {
-	latestBlockNumber, err := getLatestBlockNumber()
-	responseData := make(map[string]interface{})
+func getLatestBlockData() (Block, error) {
+	blocks, err := getBlocksData(1)
 
 	if err != nil {
-		return map[string]interface{}{},
+		return Block{},
 			fmt.Errorf("Error while getting latest block: %v", err)
 	}
 
-	latestBlock, err := getLatestBlocksByCount(1)
-
-	if err != nil {
-		return map[string]interface{}{},
-			fmt.Errorf("Error while getting latest block: %v", err)
+	if len(blocks) != 0 {
+		return blocks[0], nil
 	}
 
-	txs, err := getBlockTransactions(latestBlockNumber)
-
-	if err != nil {
-		log.Println("Error while getting transactions for block:", latestBlock)
-		return map[string]interface{}{},
-			fmt.Errorf("Error while getting transactions for block: %v. Error: %v",
-				latestBlock, err)
-	}
-
-	transactions := []map[string]string{}
-	for _, tx := range txs {
-		txDetail, err := redisClient.HGetAll(
-			fmt.Sprintf("block_tx:%v:%v:detail", latestBlockNumber, tx)).Result()
-
-		if err != nil {
-			log.Println("Error while getting transactions detail with hash:", tx)
-			continue
-		}
-
-		transactions = append(transactions, txDetail)
-	}
-
-	responseData["block"] = latestBlock[0]
-	responseData["txs"] = transactions
-
-	return responseData, nil
+	return Block{}, nil
 }
 
-func getBlocksData() ([]map[string]string, error) {
-	blocks, err := getLatestBlocksByCount(100)
+func getBlocksData(count int) ([]Block, error) {
+	cmd := redisClient.Eval(string(blocksScript), []string{strconv.Itoa(count)})
+	blocks := []Block{}
 
+	rawBlocks, err := cmd.Result()
+	log.Println(rawBlocks, err)
 	if err != nil {
-		return []map[string]string{}, err
+		return blocks, fmt.Errorf(
+			"Error while getting transactions from script: %v", err)
 	}
 
-	shortcutBlocks := []map[string]string{}
-
-	for _, block := range blocks {
-		blockNumber, err := strconv.Atoi(block["number"])
-
-		if err != nil {
-			log.Println(err)
-			continue
+	if b, ok := rawBlocks.(string); ok {
+		if b == "{}" {
+			return blocks, nil
 		}
 
-		txs, err := getBlockTransactions(blockNumber)
+		err = json.Unmarshal([]byte(b), &blocks)
 
 		if err != nil {
-			log.Println(err)
-			continue
+			return blocks, fmt.Errorf("Error while unmarshal blocks: %v", err)
 		}
-
-		shortcutBlockInfo := make(map[string]string)
-
-		shortcutBlockInfo["number"] = block["number"]
-		shortcutBlockInfo["txs"] = strconv.Itoa(len(txs))
-
-		shortcutBlocks = append(shortcutBlocks, shortcutBlockInfo)
 	}
 
-	return shortcutBlocks, nil
+	return blocks, nil
 }
 
 func getBlockData(vars map[string]string) (map[string]interface{}, error) {
@@ -656,41 +550,42 @@ func getBlockData(vars map[string]string) (map[string]interface{}, error) {
 	return responseData, nil
 }
 
-func getTransactionsData() ([]map[string]string, error) {
-	txs, err := redisClient.ZRevRangeByScore("transactions:order",
-		redis.ZRangeBy{
-			Min:    "-inf",
-			Max:    "+inf",
-			Offset: int64(0),
-			Count:  int64(100),
-		}).Result()
+func getTransactionsData(count int) (interface{}, error) {
+	cmd := redisClient.Eval(string(transactionsScript), []string{
+		strconv.Itoa(count)})
+
+	transactions, err := cmd.Result()
 
 	if err != nil {
-		return []map[string]string{}, fmt.Errorf("Error while getting transactions:order %v",
-			err)
+		return []map[string]string{}, fmt.Errorf(
+			"Error while getting transactions from script: %v", err)
 	}
 
-	transactions := []map[string]string{}
-	for _, tx := range txs {
-		txKey, err := redisClient.Keys(fmt.Sprintf(
-			"block_tx:*:%v:detail", tx)).Result()
+	txs := []Transaction{}
 
-		if err != nil {
-			log.Println("Error while getting key of transaction:", tx)
-			continue
+	if t, ok := transactions.(string); ok {
+		if t == "{}" {
+			return txs, nil
 		}
 
-		txDetail, err := redisClient.HGetAll(txKey[0]).Result()
+		err = json.Unmarshal([]byte(t), &txs)
 
 		if err != nil {
-			log.Println("Error while getting transactions detail with hash:", tx)
-			continue
+			log.Println(err)
 		}
-
-		transactions = append(transactions, txDetail)
 	}
 
-	return transactions, nil
+	for i, tx := range txs {
+		block, err := getBlockByTransaction(tx.Hash)
+
+		if err != nil {
+			log.Println("Error while getting block by txid. ", err)
+		}
+
+		txs[i].Timestamp = block["timestamp"]
+	}
+
+	return txs, nil
 }
 
 func getTransactionData(vars map[string]string) (map[string]string, error) {
@@ -720,6 +615,14 @@ func getTransactionData(vars map[string]string) (map[string]string, error) {
 			vars["hash"], err)
 	}
 
+	block, err := getBlockByTransaction(vars["hash"])
+
+	if err != nil {
+		return map[string]string{}, err
+	}
+
+	txDetail["timestamp"] = block["timestamp"]
+
 	return txDetail, err
 }
 
@@ -734,31 +637,49 @@ func getAccountsData() ([]string, error) {
 	return accounts, nil
 }
 
-func getAccountData(vars map[string]string) (map[string]interface{}, error) {
-	accountTxs, err := redisClient.ZRange(
-		fmt.Sprintf("account:%v:tx_list", vars["address"]), int64(0), int64(-1)).
-		Result()
-
-	if err != nil {
-		return map[string]interface{}{}, fmt.Errorf(
-			"Error while getting transactions list of account: %v. Error %v",
-			vars["address"], err)
+func getAccountData(vars map[string]string) (Account, error) {
+	cmd := redisClient.Eval(string(accountScript), []string{vars["address"]})
+	account := Account{
+		Address: vars["address"],
 	}
 
-	balance, err := redisClient.HGetAll(
-		fmt.Sprintf("account:%v:detail", vars["address"])).Result()
-
+	raw, err := cmd.Result()
 	if err != nil {
-		return map[string]interface{}{}, fmt.Errorf(
-			"Error while getting balance of address %v. Error %v",
-			balance["address"], err)
+		return account, fmt.Errorf(
+			"Error while getting transactions from script: %v", err)
 	}
 
-	responseData := make(map[string]interface{})
+	if r, ok := raw.(string); ok {
+		err = json.Unmarshal([]byte(r), &account)
 
-	responseData["address"] = vars["address"]
-	responseData["balance"] = balance["balance"]
-	responseData["txs"] = accountTxs
+		if err != nil {
+			return account, fmt.Errorf("Error while unmarshal blocks: %v", err)
+		}
+	}
 
-	return responseData, nil
+	fmt.Printf("%+v\n", account)
+	return account, nil
+}
+
+func loadScripts() error {
+	var err error
+	transactionsScript, err = ioutil.ReadFile("./scripts/transactions.lua")
+
+	if err != nil {
+		return fmt.Errorf("Error while loading transactions.lua: %v", err)
+	}
+
+	blocksScript, err = ioutil.ReadFile("./scripts/blocks.lua")
+
+	if err != nil {
+		return fmt.Errorf("Error while loading blocks.lua: %v", err)
+	}
+
+	accountScript, err = ioutil.ReadFile("./scripts/account.lua")
+
+	if err != nil {
+		return fmt.Errorf("Error while loading account.lua: %v", err)
+	}
+
+	return nil
 }
