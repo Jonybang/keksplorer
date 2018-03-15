@@ -15,5 +15,7 @@ $(document).ready(function() {
 });
 
 function makeShorter() {
-	$(".shortcut").text($(".shortcut").text().substring(0, 12) + "...");
+	$(".shortcut").each(function() {
+		$(this).text($(this).text().substring(0, 12) + "...");
+	});
 }
