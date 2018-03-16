@@ -1,6 +1,5 @@
 console.log('REDIS_URL', process.env.REDIS_URL);
 console.log('JSON_RPC_API_URL', process.env.JSON_RPC_API_URL);
-const HOME = process.env.HOME;
 
 const {promisify} = require('util');
 
