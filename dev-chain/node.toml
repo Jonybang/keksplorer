@@ -1,0 +1,34 @@
+[parity]
+chain = "./spec.json"
+
+[rpc]
+disable = false
+apis = ["web3", "eth", "parity", "parity_set", "net", "traces", "rpc"]
+processing_threads = 4
+cors=["all"]
+
+[websockets]
+disable = false
+apis = ["web3", "eth", "parity", "parity_set", "net", "traces", "rpc"]
+
+[ipc]
+disable = true
+
+[ui]
+disable = false
+
+[network]
+discovery = false
+
+[account]
+password = ["./node.pwd"]
+
+[mining]
+engine_signer = "0x45b101bceb624a1be83e2a1ebdf23f0e47238ff6"
+reseal_on_txs = "none"
+force_sealing = true
+
+[misc]
+log_file = "./parity.log"
+# Logging pattern (`<module>=<level>`, e.g. `own_tx=trace`).
+logging = "miner=trace,own_tx,tx_queue=trace"
