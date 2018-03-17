@@ -15,7 +15,7 @@ services:
       - 8546
     command: --config /parity/config/node.toml
     volumes:
-      - ./config/parity:/parity/config:ro
+      - ./config/parity/sokol:/parity/config:ro
     networks:
       - knet
 
