@@ -15,6 +15,26 @@ $(document).ready(function() {
 		event.preventDefault();
 	});
 
+	setThemeElements(localStorage.getItem('currentTheme') || 'light');
+
+	$('input[name=theme]').change(function (event) {
+		$('.loading').show();
+
+		var themeName = $(this).val();
+
+		if(['light','dark'].indexOf(themeName) === -1)
+			themeName = 'light';
+
+		localStorage.setItem('currentTheme', themeName);
+
+		$('#theme-style').attr('href', 'assets/build/' + themeName + '-theme.css');
+		setThemeElements(themeName);
+
+		setTimeout(function () {
+			$('.loading').hide();
+		}, 500);
+	});
+
 	convertTimestamp();
 });
 
@@ -26,3 +46,10 @@ function convertTimestamp() {
 	});
 }
 
+function setThemeElements(themeName) {
+	$('.theme-toggle > *').removeClass('active');
+
+	var $activeThemeRadio = $('input[name=theme][value=' + themeName + ']');
+	$activeThemeRadio.attr('checked', 'checked');
+	$activeThemeRadio.parent().addClass('active');
+}
