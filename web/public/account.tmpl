@@ -5,16 +5,14 @@
 	<meta charset="UTF-8">
 	<title>Accounts</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+	<link rel="stylesheet" href="assets/build/app.css">
 </head>
 <body>
 	<div class="container">
 		{{template "header" .}}
 
-		<center>
-			<h1>Account</h1>
-			<h6>address: {{.Address}}</h6>
-		</center>
+		<h1 class="text-center">Account</h1>
+		<h6 class="text-center">address: {{.Address}}</h6>
 		<hr>
 
 		<table class="table table-striped">

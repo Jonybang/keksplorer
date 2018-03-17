@@ -5,16 +5,14 @@
 	<meta charset="UTF-8">
 	<title>Latest block</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+	<link rel="stylesheet" href="assets/build/app.css">
 </head>
 <body>
 	<div class="container">
 		{{template "header" .}}
 
-		<center>
-			<h1>Transaction</h1>
-			<h6>txid: {{.hash}}</h6>
-		</center>
+		<h1 class="text-center">Transaction</h1>
+		<h6 class="text-center">txid: {{.hash}}</h6>
 		<hr>
 
 		<p>Hash: {{.hash}}</p>

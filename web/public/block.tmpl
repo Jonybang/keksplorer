@@ -5,16 +5,14 @@
 	<meta charset="UTF-8">
 	<title>Block #{{.number}}</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+	<link rel="stylesheet" href="assets/build/app.css">
 </head>
 <body>
 	<div class="container">
 		{{template "header" .}}
 
 		{{if .}}
-			<center>
-				<h1>Block #{{.block.number}}</h1>
-			</center>
+			<h1 class="text-center">Block #{{.block.number}}</h1>
 			<hr>
 			<p>Gas Used: {{.block.gasUsed}}</p>
 			<p>Hash: {{.block.hash}}</p>
@@ -23,9 +21,7 @@
 			<p>Timestamp: {{.block.timestamp}}</p>
 			<p>Validator: <a href="/accounts/{{.block.validator}}">{{.block.validator}}</a></p>
 		{{else}}
-			<center>
-				<h1>There is not such block</h1>
-			</center>
+			<h1 class="text-center">There is not such block</h1>
 		{{end}}
 
 		<table class="table table-striped">

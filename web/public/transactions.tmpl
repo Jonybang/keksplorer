@@ -5,15 +5,13 @@
 	<meta charset="UTF-8">
 	<title>Transactions list</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+	<link rel="stylesheet" href="assets/build/app.css">
 </head>
 <body>
 	<div class="container">
 		{{template "header" .}}
 		
-		<center>
-			<h1>Transactions</h1>
-		</center>
+		<h1 class="text-center">Transactions</h1>
 		<hr>
 
 		{{if .}}
@@ -47,9 +45,7 @@
 		  </tbody>
 		</table>
 		{{else}}
-			<center>
-				<p>There is no such transactions. Please wait a while...</p>
-			</center>
+			<p class="text-center">There is no such transactions. Please wait a while...</p>
 		{{end}}
 
 	</div>

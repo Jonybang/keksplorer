@@ -5,20 +5,18 @@
 	<meta charset="UTF-8">
 	<title>Welcome</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+	<link rel="stylesheet" href="assets/build/app.css">
 </head>
 <body>
 	<div class="container">
 		{{template "header" .}}
 
-		<center>
-			<h1>keksplorer</h1>
-		</center>
+		<h1 class="text-center">keksplorer</h1>
 		<hr>
 
 		{{if .blocks}}
 		<div class="row">
-		  <div class="col-6">
+		  <div class="col-md-6">
 		  <h2>Recent blocks</h2>
 			<table class="table">
 			  <thead>
@@ -39,7 +37,7 @@
 			  </tbody>
 			</table>
 		  </div>
-		  <div class="col-6">
+		  <div class="col-md-6">
 			<h2>Recent transactions</h2>
 			<table class="table">
 			  <thead>
@@ -70,20 +68,16 @@
 		  </div>
 		</div>
 		{{else}}
-			<center>
-				<p>There is no such blocks or transactions. Please wait a while...</p>
-			</center>
+			<p class="text-center">There is no such blocks or transactions. Please wait a while...</p>
 			<div class="row">
 		 		<div class="col-12">
-		 			<center>
-			 			<p>
-			 				{{.percentLoaded}}% of blocks is loaded
-			 			</p>
-			 			<div class="progress">
-							<div class="progress-bar" role="progressbar" style="width: {{.percentLoaded}}%" aria-valuenow="{{.percentLoaded}}" aria-valuemin="0" aria-valuemax="100">
-							</div>
+					<p class="text-center">
+						{{.percentLoaded}}% of blocks is loaded
+					</p>
+					<div class="progress">
+						<div class="progress-bar" role="progressbar" style="width: {{.percentLoaded}}%" aria-valuenow="{{.percentLoaded}}" aria-valuemin="0" aria-valuemax="100">
 						</div>
-		 			</center>
+					</div>
 		 		</div>
 		 	</div>
 		{{end}}
