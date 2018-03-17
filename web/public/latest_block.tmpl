@@ -14,33 +14,29 @@
 		<h1 class="text-center">Latest block</h1>
 		<hr>
 		{{if .}}
-		<p>Gas Used: {{.GasUsed}}</p>
-		<p>Hash: {{.Hash}}</p>
-		<p>Number: {{.Number}}</p>
-		<p>Size: {{.Size}}</p>
-		<p>Timestamp: {{.Timestamp}}</p>
-		<p>Validator: <a href="/accounts/{{.Validator}}">{{.Validator}}</a></p>
+			<p>Gas Used: {{.GasUsed}}</p>
+			<p>Hash: {{.Hash}}</p>
+			<p>Number: {{.Number}}</p>
+			<p>Size: {{.Size}}</p>
+			<p>Timestamp: {{.Timestamp}}</p>
+			<p>Validator: <a href="/accounts/{{.Validator}}">{{.Validator}}</a></p>
 
-		<table class="table table-striped">
-		  <thead>
-		    <tr>
-		      <th>TXID</th>
-		      <th>To</th>
-		      <th>From</th>
-		      <th>Value</th>
-		    </tr>
-		  </thead>
-		  <tbody>
+			<div class="block-table">
+				<div class="row">
+					<div class="col-md-3 bt-header">TXID</div>
+					<div class="col-md-3 bt-header">To</div>
+					<div class="col-md-3 bt-header">From</div>
+					<div class="col-md-3 bt-header">Value</div>
+				</div>
 				{{range .Txs}}
-			    <tr>
-			      <th scope="row"><a href="/transactions/{{.Hash}}" class="shortcut">{{.Hash}}</a></th>
-			      <td><a href="/accounts/{{.To}}" class="shortcut">{{.To}}</a></td>
-			      <td><a href="/accounts/{{.From}}" class="shortcut">{{.From}}</a></td>
-			      <td>{{.Value}}</td>
-			    </tr>
-		    {{end}}
-		  </tbody>
-		</table>
+				<div class="row">
+					<div class="col-md-3"><a href="/transactions/{{.Hash}}">{{.Hash}}</a></div>
+					<div class="col-md-3"><a href="/accounts/{{.To}}">{{.To}}</a></div>
+					<div class="col-md-3"><a href="/accounts/{{.From}}">{{.From}}</a></div>
+					<div class="col-md-3">{{.Value}}</div>
+				</div>
+				{{end}}
+			</div>
 
 		{{else}}
 			<p class="text-center">There is no such blocks or transactions. Please wait a while...</p>

@@ -15,12 +15,6 @@ $(document).ready(function() {
 	convertTimestamp();
 });
 
-function makeShorter() {
-	$(".shortcut").each(function() {
-		$(this).text($(this).text().substring(0, 12) + "...");
-	});
-}
-
 function convertTimestamp() {
 	$(".age").each(function() {
 		var now = new Date(+($(this).text())*1000); 

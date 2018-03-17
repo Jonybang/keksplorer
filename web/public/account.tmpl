@@ -15,20 +15,16 @@
 		<h6 class="text-center">address: {{.Address}}</h6>
 		<hr>
 
-		<table class="table table-striped">
-		  <thead>
-		    <tr>
-		      <th>Transactions</th>
-		    </tr>
-		  </thead>
-		  <tbody>
-		  	{{range .Txs}}
-			    <tr>
-				  <td><a href="/transactions/{{.}}">{{.}}</a></td>
-			    </tr>
-		    {{end}}
-		  </tbody>
-		</table>
+		<div class="block-table">
+			<div class="row">
+				<div class="col-md-12 bt-header">Transactions</div>
+			</div>
+			{{range .}}
+				<div class="row">
+					<div class="col-md-12"><a href="/transactions/{{.}}">{{.}}</a></div>
+				</div>
+			{{end}}
+		</div>
 	</div>
 
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>

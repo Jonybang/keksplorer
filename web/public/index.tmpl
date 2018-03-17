@@ -15,58 +15,51 @@
 		<hr>
 
 		{{if .blocks}}
-		<div class="row">
-		  <div class="col-md-6">
-		  <h2>Recent blocks</h2>
-			<table class="table">
-			  <thead>
-			    <tr>
-			      <th>Block Number</th>
-			      <th>Transactions</th>
-			      <th>Validator</th>
-			    </tr>
-			  </thead>
-			  <tbody>
-				{{range .blocks}}
-				    <tr>
-				      <th scope="row"><a href="/blocks/{{.Number}}">{{.Number}}</a></th>
-				      <th scope="row">{{.TransactionsLength}}</th>
-				      <th scope="row"><a href="/accounts/{{.Validator}}" class="shortcut">{{.Validator}}</a></th>
-				    </tr>
-			    {{end}}
-			  </tbody>
-			</table>
-		  </div>
-		  <div class="col-md-6">
-			<h2>Recent transactions</h2>
-			<table class="table">
-			  <thead>
-			    <tr>
-			      <th>TXID</th>
-			      <th>From</th>
-			      <th>To</th>
-			      <th>Value</th>
-			    </tr>
-			  </thead>
-			  <tbody>
-				{{range .txs}}
-				    <tr>
-				      <th scope="row"><a href="/transactions/{{.Hash}}" class="shortcut">{{.Hash}}</a></th>
-				      <th scope="row"><a href="/accounts/{{.From}}" class="shortcut">{{.From}}</a></th>
-				      <th scope="row">
-				      	{{if .To}}
-				      		<a href="/accounts/{{.To}}" class="shortcut">{{.To}}</a>
-				      	{{else}}
-				      		<p>Contract Deployment</a>
-				      	{{end}}
-				    	</th>
-				      <th scope="row">{{.Value}}</th>
-				    </tr>
-			    {{end}}
-			  </tbody>
-			</table>
-		  </div>
-		</div>
+			<div class="row">
+			  <div class="col-md-6">
+				<h2>Recent blocks</h2>
+				<div class="block-table">
+				  <div class="row">
+					  <div class="col-md-4 bt-header">Block Number</div>
+					  <div class="col-md-4 bt-header">Transactions</div>
+					  <div class="col-md-4 bt-header">Validator</div>
+				  </div>
+
+				  {{range .blocks}}
+					  <div class="row">
+						  <div class="col-md-4"><a href="/blocks/{{.Number}}">{{.Number}}</a></div>
+						  <div class="col-md-4">{{.TransactionsLength}}</div>
+						  <div class="col-md-4"><a href="/accounts/{{.Validator}}">{{.Validator}}</a></div>
+					  </div>
+				  {{end}}
+				</div>
+			  </div>
+			  <div class="col-md-6">
+				<h2>Recent transactions</h2>
+				<div class="block-table">
+				  <div class="row">
+					  <div class="col-md-3 bt-header">TXID</div>
+					  <div class="col-md-3 bt-header">From</div>
+					  <div class="col-md-3 bt-header">To</div>
+					  <div class="col-md-3 bt-header">Value</div>
+				  </div>
+				  {{range .txs}}
+					  <div class="row">
+						  <div class="col-md-3"><a href="/transactions/{{.Hash}}">{{.Hash}}</a></div>
+						  <div class="col-md-3"><a href="/accounts/{{.From}}">{{.From}}</a></div>
+						  <div class="col-md-3">
+							  {{if .To}}
+								<a href="/accounts/{{.To}}" class="shortcut">{{.To}}</a>
+							  {{else}}
+								<p>Contract Deployment</a>
+							  {{end}}
+						  </div>
+						  <div class="col-md-3">{{.Value}}</div>
+					  </div>
+				  {{end}}
+				</div>
+			  </div>
+			</div>
 		{{else}}
 			<p class="text-center">There is no such blocks or transactions. Please wait a while...</p>
 			<div class="row">

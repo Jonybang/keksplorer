@@ -15,35 +15,32 @@
 		<hr>
 
 		{{if .}}
-		<table class="table table-striped">
-		  <thead>
-		    <tr>
-		    	<th>Block</th>
-		    	<th>Created</th>
-		      <th>TXID</th>
-		      <th>From</th>
-		      <th>To</th>
-		      <th>Value</th>
-		    </tr>
-		  </thead>
-		  <tbody>
-			{{range .}}
-			    <tr>
-			    <td><a href="/blocks/{{.BlockNumber}}">{{.BlockNumber}}</a></td>
-			    <td><p class="age">{{.Timestamp}}</p></td>
-				  <td><a href="/transactions/{{.Hash}}" class="shortcut">{{.Hash}}</a></td>
-				  <td><a href="/accounts/{{.From}}" class="shortcut">{{.From}}</a></td>
-				  <td>
-			      	{{if .To}}
-			      		<a href="/accounts/{{.To}}" class="shortcut">{{.To}}</a>
-			      	{{else}}
-			      		<p>Contract Deployment</a>
-			      	{{end}}
-				  <td>{{.Value}}</td>
-			    </tr>
-		    {{end}}
-		  </tbody>
-		</table>
+			<div class="block-table">
+				<div class="row">
+					<div class="col-md-2 bt-header">Block</div>
+					<div class="col-md-2 bt-header">Created</div>
+					<div class="col-md-2 bt-header">TXID</div>
+					<div class="col-md-2 bt-header">From</div>
+					<div class="col-md-2 bt-header">To</div>
+					<div class="col-md-2 bt-header">Value</div>
+				</div>
+				{{range .Txs}}
+				<div class="row">
+					<div class="col-md-3"><a href="/blocks/{{.BlockNumber}}">{{.BlockNumber}}</a></div>
+					<div class="col-md-3"><p class="age">{{.Timestamp}}</p></div>
+					<div class="col-md-3"><a href="/transactions/{{.Hash}}">{{.Hash}}</a></div>
+					<div class="col-md-3"><a href="/accounts/{{.From}}">{{.From}}</a></div>
+					<div class="col-md-3">
+						{{if .To}}
+							<a href="/accounts/{{.To}}">{{.To}}</a>
+						{{else}}
+							<p>Contract Deployment</a>
+						{{end}}
+					</div>
+					<div class="col-md-3">{{.Value}}</div>
+				</div>
+				{{end}}
+			</div>
 		{{else}}
 			<p class="text-center">There is no such transactions. Please wait a while...</p>
 		{{end}}

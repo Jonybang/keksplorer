@@ -14,22 +14,18 @@
 		<h1 class="text-center">Blocks</h1>
 		<hr>
 		{{if .}}
-			<table class="table">
-			  <thead>
-			    <tr>
-			      <th>Block Number</th>
-			      <th>Transactions</th>
-			    </tr>
-			  </thead>
-			  <tbody>
-			  	{{range .}}
-				    <tr>
-				      <th scope="row"><a href="/blocks/{{.Number}}">{{.Number}}</a></th>
-				      <th scope="row">{{.TransactionsLength}}</th>
-				    </tr>
-			    {{end}}
-			  </tbody>
-			</table>
+			<div class="block-table">
+				<div class="row">
+					<div class="col-md-6 bt-header">Block Number</div>
+					<div class="col-md-6 bt-header">Transactions</div>
+				</div>
+				{{range .}}
+					<div class="row">
+						<div class="col-md-6"><a href="/blocks/{{.Number}}">{{.Number}}</a></div>
+						<div class="col-md-6">{{.TransactionsLength}}</div>
+					</div>
+				{{end}}
+			</div>
 		{{else}}
 			<p class="text-center">There is no such blocks or transactions. Please wait a while...</p>
 		{{end}}

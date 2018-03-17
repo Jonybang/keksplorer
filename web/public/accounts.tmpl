@@ -15,20 +15,16 @@
 		<hr>
 		
 		{{if .}}
-		<table class="table table-striped">
-		  <thead>
-		    <tr>
-		      <th>Address</th>
-		    </tr>
-		  </thead>
-		  <tbody>
-		  	{{range .}}
-			    <tr>
-				  <td><a href="/accounts/{{.}}">{{.}}</a></td>
-			    </tr>
-		    {{end}}
-		  </tbody>
-		</table>
+			<div class="block-table">
+				<div class="row">
+					<div class="col-md-12 bt-header">Address</div>
+				</div>
+				{{range .}}
+					<div class="row">
+						<div class="col-md-12"><a href="/accounts/{{.}}">{{.}}</a></div>
+					</div>
+				{{end}}
+			</div>
 		{{else}}
 			<p class="text-center">There is no such blocks or transactions. Please wait a while...</p>
 		{{end}}
