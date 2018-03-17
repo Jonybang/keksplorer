@@ -28,10 +28,10 @@ $(document).ready(function() {
 		localStorage.setItem('currentTheme', themeName);
 
 		$('#theme-style').attr('href', 'assets/build/' + themeName + '-theme.css');
-		setThemeElements(themeName);
 
 		setTimeout(function () {
 			$('.loading').hide();
+			setThemeElements(themeName);
 		}, 500);
 	});
 
