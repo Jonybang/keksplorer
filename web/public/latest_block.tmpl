@@ -5,54 +5,47 @@
 	<meta charset="UTF-8">
 	<title>Latest block</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+	<link rel="stylesheet" href="assets/build/app.css">
 </head>
 <body>
 	<div class="container">
 		{{template "header" .}}
 
-		<center>
-			<h1>Latest block</h1>
-		</center>
-		<hr>
-		{{if .}}
-		<p>Gas Used: {{.GasUsed}}</p>
-		<p>Hash: {{.Hash}}</p>
-		<p>Number: {{.Number}}</p>
-		<p>Size: {{.Size}}</p>
-		<p>Timestamp: {{.Timestamp}}</p>
-		<p>Validator: <a href="/accounts/{{.Validator}}">{{.Validator}}</a></p>
+		<section id="content">
+			<h1 class="text-center">Latest block</h1>
+			<hr>
+			{{if .}}
+				<p>Gas Used: {{.GasUsed}}</p>
+				<p>Hash: {{.Hash}}</p>
+				<p>Number: {{.Number}}</p>
+				<p>Size: {{.Size}}</p>
+				<p>Timestamp: {{.Timestamp}}</p>
+				<p>Validator: <a href="/accounts/{{.Validator}}">{{.Validator}}</a></p>
 
-		<table class="table table-striped">
-		  <thead>
-		    <tr>
-		      <th>TXID</th>
-		      <th>To</th>
-		      <th>From</th>
-		      <th>Value</th>
-		    </tr>
-		  </thead>
-		  <tbody>
-				{{range .Txs}}
-			    <tr>
-			      <th scope="row"><a href="/transactions/{{.Hash}}" class="shortcut">{{.Hash}}</a></th>
-			      <td><a href="/accounts/{{.To}}" class="shortcut">{{.To}}</a></td>
-			      <td><a href="/accounts/{{.From}}" class="shortcut">{{.From}}</a></td>
-			      <td>{{.Value}}</td>
-			    </tr>
-		    {{end}}
-		  </tbody>
-		</table>
+				<div class="block-table">
+					<div class="row">
+						<div class="col-md-3 bt-header">TXID</div>
+						<div class="col-md-3 bt-header">To</div>
+						<div class="col-md-3 bt-header">From</div>
+						<div class="col-md-3 bt-header">Value</div>
+					</div>
+					{{range .Txs}}
+					<div class="row">
+						<div class="col-md-3"><a href="/transactions/{{.Hash}}">{{.Hash}}</a></div>
+						<div class="col-md-3"><a href="/accounts/{{.To}}">{{.To}}</a></div>
+						<div class="col-md-3"><a href="/accounts/{{.From}}">{{.From}}</a></div>
+						<div class="col-md-3">{{.Value}}</div>
+					</div>
+					{{end}}
+				</div>
 
-		{{else}}
-			<center>
-				<p>There is no such blocks or transactions. Please wait a while...</p>
-			</center>
-		{{end}}
+			{{else}}
+				<p class="text-center">There is no such blocks or transactions. Please wait a while...</p>
+			{{end}}
+		</section>
 	</div>
 
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-	<script src="/assets/js/main.js"></script>
+	<script src="assets/build/app.js"></script>
 
 </body>
 </html>

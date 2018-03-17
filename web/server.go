@@ -89,12 +89,14 @@ func mainViewController(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles("./public/index.tmpl",
 		"./public/templates/header.tmpl"))
 
+	response["percentLoaded"] = 0
+
 	blocks, err := getBlocksData(5)
 
 	if len(blocks) == 0 && err == nil {
 		countBlocks, err := redisClient.Keys("block:*:detail").Result()
 		if err != nil {
-			tmpl.ExecuteTemplate(w, "main", "")
+			tmpl.ExecuteTemplate(w, "main", response)
 
 			log.Println("Error while getting count of blocks: ", err)
 			return
@@ -102,7 +104,7 @@ func mainViewController(w http.ResponseWriter, r *http.Request) {
 
 		latestBlock, err := redisClient.Get("latest_block").Result()
 		if err != nil {
-			tmpl.ExecuteTemplate(w, "main", "")
+			tmpl.ExecuteTemplate(w, "main", response)
 
 			log.Println("Error while getting latest block: ", err)
 			return
@@ -111,25 +113,23 @@ func mainViewController(w http.ResponseWriter, r *http.Request) {
 		latestBlockNumber, err := strconv.Atoi(latestBlock)
 
 		if err != nil {
-			tmpl.ExecuteTemplate(w, "main", "")
+			tmpl.ExecuteTemplate(w, "main", response)
 
 			log.Println("Error while converting: ", err)
 			return
 		}
 
-		progress := make(map[string]interface{})
-
 		percentLoaded := float32(len(countBlocks)) /
 			float32(latestBlockNumber) * float32(100)
 
-		progress["percentLoaded"] = int(percentLoaded)
+		response["percentLoaded"] = int(percentLoaded)
 
-		tmpl.ExecuteTemplate(w, "main", progress)
+		tmpl.ExecuteTemplate(w, "main", response)
 		return
 	}
 
 	if err != nil {
-		tmpl.ExecuteTemplate(w, "main", "")
+		tmpl.ExecuteTemplate(w, "main", response)
 
 		log.Println("Error while getting latest blocks: ", err)
 		return

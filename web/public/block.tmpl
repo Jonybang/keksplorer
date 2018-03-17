@@ -5,53 +5,46 @@
 	<meta charset="UTF-8">
 	<title>Block #{{.number}}</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+	<link rel="stylesheet" href="assets/build/app.css">
 </head>
 <body>
 	<div class="container">
 		{{template "header" .}}
 
-		{{if .}}
-			<center>
-				<h1>Block #{{.block.number}}</h1>
-			</center>
-			<hr>
-			<p>Gas Used: {{.block.gasUsed}}</p>
-			<p>Hash: {{.block.hash}}</p>
-			<p>Number: {{.block.number}}</p>
-			<p>Size: {{.block.size}}</p>
-			<p>Timestamp: {{.block.timestamp}}</p>
-			<p>Validator: <a href="/accounts/{{.block.validator}}">{{.block.validator}}</a></p>
-		{{else}}
-			<center>
-				<h1>There is not such block</h1>
-			</center>
-		{{end}}
+		<section id="content">
+			{{if .}}
+				<h1 class="text-center">Block #{{.block.number}}</h1>
+				<hr>
+				<p>Gas Used: {{.block.gasUsed}}</p>
+				<p>Hash: {{.block.hash}}</p>
+				<p>Number: {{.block.number}}</p>
+				<p>Size: {{.block.size}}</p>
+				<p>Timestamp: {{.block.timestamp}}</p>
+				<p>Validator: <a href="/accounts/{{.block.validator}}">{{.block.validator}}</a></p>
+			{{else}}
+				<h1 class="text-center">There is not such block</h1>
+			{{end}}
 
-		<table class="table table-striped">
-		  <thead>
-		    <tr>
-		      <th>TXID</th>
-		      <th>To</th>
-		      <th>From</th>
-		      <th>Value</th>
-		    </tr>
-		  </thead>
-		  <tbody>
+			<div class="block-table">
+				<div class="row">
+					<div class="col-md-3 bt-header">TXID</div>
+					<div class="col-md-3 bt-header">To</div>
+					<div class="col-md-3 bt-header">From</div>
+					<div class="col-md-3 bt-header">Value</div>
+				</div>
 				{{range .txs}}
-			    <tr>
-			      <th scope="row"><a href="/transactions/{{.hash}}" class="shortcut">{{.hash}}</a></th>
-			      <td><a href="/accounts/{{.to}}" class="shortcut">{{.to}}</a></td>
-			      <td><a href="/accounts/{{.from}}" class="shortcut">{{.from}}</a></td>
-			      <td>{{.value}}</td>
-			    </tr>
-		    {{end}}
-		  </tbody>
-		</table>
+					<div class="row">
+						<div class="col-md-3"><a href="/transactions/{{.hash}}">{{.hash}}</a></div>
+						<div class="col-md-3"><a href="/accounts/{{.to}}">{{.to}}</a></div>
+						<div class="col-md-3"><a href="/accounts/{{.from}}">{{.from}}</a></div>
+						<div class="col-md-3">{{.value}}</div>
+					</div>
+				{{end}}
+			</div>
+		</section>
 	</div>
 
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-	<script src="/assets/js/main.js"></script>
+	<script src="assets/build/app.js"></script>
 
 </body>
 </html>

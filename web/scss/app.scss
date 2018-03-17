@@ -1,0 +1,36 @@
+@import '~bootstrap/scss/bootstrap';
+
+.block-table {
+    padding: 0.5rem;
+
+    .bt-header {
+        font-weight: bold;
+    }
+
+    & > .row {
+        vertical-align: bottom;
+        padding: 0.75rem;
+        border-top: 1px solid #dee2e6;
+        &:first-child {
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        & > div[class*="col-"] {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
+}
+
+
+@media (max-width: 575px) {
+    .container {
+        padding-right: 0;
+        padding-left: 0;
+    }
+    section#content {
+        padding: 0 10px;
+    }
+}
+

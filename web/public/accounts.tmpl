@@ -5,41 +5,34 @@
 	<meta charset="UTF-8">
 	<title>Accounts</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+	<link rel="stylesheet" href="assets/build/app.css">
 </head>
 <body>
 	<div class="container">
 		{{template "header" .}}
 
-		<center>
-			<h1>Accounts list</h1>
-		</center>
-		<hr>
-		
-		{{if .}}
-		<table class="table table-striped">
-		  <thead>
-		    <tr>
-		      <th>Address</th>
-		    </tr>
-		  </thead>
-		  <tbody>
-		  	{{range .}}
-			    <tr>
-				  <td><a href="/accounts/{{.}}">{{.}}</a></td>
-			    </tr>
-		    {{end}}
-		  </tbody>
-		</table>
-		{{else}}
-			<center>
-				<p>There is no such blocks or transactions. Please wait a while...</p>
-			</center>
-		{{end}}
+		<section id="content">
+			<h1 class="text-center">Accounts list</h1>
+			<hr>
+
+			{{if .}}
+				<div class="block-table">
+					<div class="row">
+						<div class="col-md-12 bt-header">Address</div>
+					</div>
+					{{range .}}
+					<div class="row">
+						<div class="col-md-12"><a href="/accounts/{{.}}">{{.}}</a></div>
+					</div>
+					{{end}}
+				</div>
+			{{else}}
+				<p class="text-center">There is no such blocks or transactions. Please wait a while...</p>
+			{{end}}
+		</section>
 	</div>
 
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-	<script src="/assets/js/main.js"></script>
+	<script src="assets/build/app.js"></script>
 
 </body>
 </html>
