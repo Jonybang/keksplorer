@@ -1,36 +1,18 @@
-{{define "account"}}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<title>Accounts</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<link rel="stylesheet" href="assets/build/app.css">
-</head>
-<body>
-	<div class="container">
-		{{template "header" .}}
+{{define "title"}}Account {{.Address}}{{end}}
 
-		<section id="content">
-			<h1 class="text-center">Account</h1>
-			<h6 class="text-center">address: {{.Address}}</h6>
-			<hr>
+{{define "content"}}
+	<h1 class="text-center">Account</h1>
+	<h6 class="text-center">address: {{.Address}}</h6>
+	<hr>
 
-			<div class="block-table">
-				<div class="row">
-					<div class="col-md-12 bt-header">Transactions</div>
-				</div>
-				{{range .}}
-					<div class="row">
-						<div class="col-md-12"><a href="/transactions/{{.}}">{{.}}</a></div>
-					</div>
-				{{end}}
+	<div class="block-table">
+		<div class="row">
+			<div class="col-md-12 bt-header">Transactions</div>
+		</div>
+		{{range .}}
+			<div class="row">
+				<div class="col-md-12"><a href="/transactions/{{.}}">{{.}}</a></div>
 			</div>
-		</section>
+		{{end}}
 	</div>
-
-	<script src="assets/build/app.js"></script>
-
-</body>
-</html>
 {{end}}

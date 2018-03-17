@@ -1,40 +1,22 @@
-{{define "blocks"}}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<title>Blocks </title>
-	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<link rel="stylesheet" href="assets/build/app.css">
-</head>
-<body>
-	<div class="container">
-		{{template "header" .}}
+{{define "title"}}Blocks{{end}}
 
-		<section id="content">
-			<h1 class="text-center">Blocks</h1>
-			<hr>
-			{{if .}}
-				<div class="block-table">
-					<div class="row">
-						<div class="col-md-6 bt-header">Block Number</div>
-						<div class="col-md-6 bt-header">Transactions</div>
-					</div>
-					{{range .}}
-						<div class="row">
-							<div class="col-md-6"><a href="/blocks/{{.Number}}">{{.Number}}</a></div>
-							<div class="col-md-6">{{.TransactionsLength}}</div>
-						</div>
-					{{end}}
-				</div>
-			{{else}}
-				<p class="text-center">There is no such blocks or transactions. Please wait a while...</p>
+{{define "content"}}
+	<h1 class="text-center">Blocks</h1>
+	<hr>
+	{{if .}}
+		<div class="block-table">
+			<div class="row">
+				<div class="col-md-6 bt-header">Block Number</div>
+				<div class="col-md-6 bt-header">Transactions</div>
+			</div>
+			{{range .}}
+			<div class="row">
+				<div class="col-md-6"><a href="/blocks/{{.Number}}">{{.Number}}</a></div>
+				<div class="col-md-6">{{.TransactionsLength}}</div>
+			</div>
 			{{end}}
-		</section>
-	</div>
-
-	<script src="assets/build/app.js"></script>
-
-</body>
-</html>
+		</div>
+	{{else}}
+		<p class="text-center">There is no such blocks or transactions. Please wait a while...</p>
+	{{end}}
 {{end}}

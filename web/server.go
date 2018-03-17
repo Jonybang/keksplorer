@@ -74,7 +74,7 @@ func main() {
 
 	srv := &http.Server{
 		Handler:      r,
-		Addr:         "0.0.0.0:8080",
+		Addr:         "0.0.0.0:8081",
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  20 * time.Second,
 	}
@@ -86,8 +86,7 @@ func main() {
 
 func mainViewController(w http.ResponseWriter, r *http.Request) {
 	response := make(map[string]interface{})
-	tmpl := template.Must(template.ParseFiles("./public/index.tmpl",
-		"./public/templates/header.tmpl"))
+	tmpl := getTemplate("index")
 
 	response["percentLoaded"] = 0
 
@@ -96,7 +95,7 @@ func mainViewController(w http.ResponseWriter, r *http.Request) {
 	if len(blocks) == 0 && err == nil {
 		countBlocks, err := redisClient.Keys("block:*:detail").Result()
 		if err != nil {
-			tmpl.ExecuteTemplate(w, "main", response)
+			tmpl.ExecuteTemplate(w, "base", response)
 
 			log.Println("Error while getting count of blocks: ", err)
 			return
@@ -104,7 +103,7 @@ func mainViewController(w http.ResponseWriter, r *http.Request) {
 
 		latestBlock, err := redisClient.Get("latest_block").Result()
 		if err != nil {
-			tmpl.ExecuteTemplate(w, "main", response)
+			tmpl.ExecuteTemplate(w, "base", response)
 
 			log.Println("Error while getting latest block: ", err)
 			return
@@ -113,7 +112,7 @@ func mainViewController(w http.ResponseWriter, r *http.Request) {
 		latestBlockNumber, err := strconv.Atoi(latestBlock)
 
 		if err != nil {
-			tmpl.ExecuteTemplate(w, "main", response)
+			tmpl.ExecuteTemplate(w, "base", response)
 
 			log.Println("Error while converting: ", err)
 			return
@@ -124,12 +123,12 @@ func mainViewController(w http.ResponseWriter, r *http.Request) {
 
 		response["percentLoaded"] = int(percentLoaded)
 
-		tmpl.ExecuteTemplate(w, "main", response)
+		tmpl.ExecuteTemplate(w, "base", response)
 		return
 	}
 
 	if err != nil {
-		tmpl.ExecuteTemplate(w, "main", response)
+		tmpl.ExecuteTemplate(w, "base", response)
 
 		log.Println("Error while getting latest blocks: ", err)
 		return
@@ -146,17 +145,16 @@ func mainViewController(w http.ResponseWriter, r *http.Request) {
 	response["blocks"] = blocks
 	response["txs"] = txs
 
-	tmpl.ExecuteTemplate(w, "main", response)
+	tmpl.ExecuteTemplate(w, "base", response)
 }
 
 func blocksViewController(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("./public/blocks.tmpl",
-		"./public/templates/header.tmpl"))
+	tmpl := getTemplate("blocks")
 	blocks, err := getBlocksData(50)
 
 	log.Println(blocks)
 	if len(blocks) == 0 {
-		tmpl.ExecuteTemplate(w, "blocks", "")
+		tmpl.ExecuteTemplate(w, "base", "")
 		return
 	}
 
@@ -165,22 +163,21 @@ func blocksViewController(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl.ExecuteTemplate(w, "blocks", blocks)
+	tmpl.ExecuteTemplate(w, "base", blocks)
 }
 
 func blockViewController(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("./public/block.tmpl",
-		"./public/templates/header.tmpl"))
+	tmpl := getTemplate("block")
 	vars := mux.Vars(r)
 
 	block, err := getBlockData(vars)
 
 	if err != nil {
-		tmpl.ExecuteTemplate(w, "block", "")
+		tmpl.ExecuteTemplate(w, "base", "")
 		return
 	}
 
-	tmpl.ExecuteTemplate(w, "block", block)
+	tmpl.ExecuteTemplate(w, "base", block)
 }
 
 func transactionsViewController(w http.ResponseWriter, r *http.Request) {
@@ -191,10 +188,9 @@ func transactionsViewController(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl := template.Must(template.ParseFiles("./public/transactions.tmpl",
-		"./public/templates/header.tmpl"))
+	tmpl := getTemplate("transactions")
 
-	tmpl.ExecuteTemplate(w, "transactions", transactions)
+	tmpl.ExecuteTemplate(w, "base", transactions)
 }
 
 func transactionViewController(w http.ResponseWriter, r *http.Request) {
@@ -207,10 +203,9 @@ func transactionViewController(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl := template.Must(template.ParseFiles("./public/transaction.tmpl",
-		"./public/templates/header.tmpl"))
+	tmpl := getTemplate("transaction")
 
-	tmpl.ExecuteTemplate(w, "transaction", txDetail)
+	tmpl.ExecuteTemplate(w, "base", txDetail)
 }
 
 func accountsViewController(w http.ResponseWriter, r *http.Request) {
@@ -221,10 +216,9 @@ func accountsViewController(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl := template.Must(template.ParseFiles("./public/accounts.tmpl",
-		"./public/templates/header.tmpl"))
+	tmpl := getTemplate("accounts")
 
-	tmpl.ExecuteTemplate(w, "accounts", accounts)
+	tmpl.ExecuteTemplate(w, "base", accounts)
 }
 
 func accountViewController(w http.ResponseWriter, r *http.Request) {
@@ -237,10 +231,15 @@ func accountViewController(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl := template.Must(template.ParseFiles("./public/account.tmpl",
-		"./public/templates/header.tmpl"))
+	tmpl := getTemplate("account")
 
-	tmpl.ExecuteTemplate(w, "account", account)
+	tmpl.ExecuteTemplate(w, "base", account)
+}
+
+func getTemplate(templateName string) (*template.Template) {
+	return template.Must(template.ParseFiles("./public/" + templateName + ".tmpl",
+		"./public/layouts/base.tmpl",
+		"./public/chunks/header.tmpl"))
 }
 
 // API

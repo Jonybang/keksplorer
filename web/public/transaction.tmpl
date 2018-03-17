@@ -1,44 +1,26 @@
-{{define "transaction"}}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<title>Latest block</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<link rel="stylesheet" href="assets/build/app.css">
-</head>
-<body>
-	<div class="container">
-		{{template "header" .}}
+{{define "title"}}Transaction {{.hash}}{{end}}
 
-		<section id="content">
-			<h1 class="text-center">Transaction</h1>
-			<h6 class="text-center">txid: {{.hash}}</h6>
-			<hr>
+{{define "content"}}
+	<h1 class="text-center">Transaction</h1>
+	<h6 class="text-center">txid: {{.hash}}</h6>
+	<hr>
 
-			<p>Hash: {{.hash}}</p>
-			<p>Block Number: <a href="/blocks/{{.blockNumber}}">{{.blockNumber}}</a></p>
-			<p>Created: <span class="age">{{.timestamp}}</span></p>
-			<p>Status: {{.status}}</p>
-			<p>From: <a href="/accounts/{{.from}}">{{.from}}</a></p>
-			<p>To:
-				{{if .to}}
-					<a href="/accounts/{{.to}}">{{.to}}</a>
-				{{else}}
-					<p>Contract Deployment</a>
-				{{end}}
-			<p>Value: {{.value}}</p>
-			<p>Gas: {{.gas}}</p>
-			<p>GasPrice: {{.gasPrice}}</p>
-			<p>Nonce: {{.nonce}}</p>
-			<p>Input:
-				<textarea class="form-control" name="" id="" cols="100" rows="1">{{.input}}</textarea>
-			</p>
-		</section>
-	</div>
-
-	<script src="assets/build/app.js"></script>
-
-</body>
-</html>
+	<p>Hash: {{.hash}}</p>
+	<p>Block Number: <a href="/blocks/{{.blockNumber}}">{{.blockNumber}}</a></p>
+	<p>Created: <span class="age">{{.timestamp}}</span></p>
+	<p>Status: {{.status}}</p>
+	<p>From: <a href="/accounts/{{.from}}">{{.from}}</a></p>
+	<p>To:
+		{{if .to}}
+		<a href="/accounts/{{.to}}">{{.to}}</a>
+		{{else}}
+	<p>Contract Deployment</a>
+		{{end}}
+	<p>Value: {{.value}}</p>
+	<p>Gas: {{.gas}}</p>
+	<p>GasPrice: {{.gasPrice}}</p>
+	<p>Nonce: {{.nonce}}</p>
+	<p>Input:
+		<textarea class="form-control" name="" id="" cols="100" rows="1">{{.input}}</textarea>
+	</p>
 {{end}}

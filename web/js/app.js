@@ -1,4 +1,4 @@
-require('../node_modules/jquery/jquery');
+window.$ = window.jQuery = require('../node_modules/jquery/dist/jquery');
 require('../node_modules/bootstrap/dist/js/bootstrap');
 require('../node_modules/popper.js/dist/popper');
 
