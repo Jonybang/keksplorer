@@ -13,11 +13,9 @@
 
 		<center>
 			<h1>Account</h1>
-			<h6>address: {{.address}}</h6>
+			<h6>address: {{.Address}}</h6>
 		</center>
 		<hr>
-		<!-- TODO: Implement later -->
-		<!-- <p>Account balance: {{.balance}}</p> -->
 
 		<table class="table table-striped">
 		  <thead>
@@ -26,7 +24,7 @@
 		    </tr>
 		  </thead>
 		  <tbody>
-		  	{{range .txs}}
+		  	{{range .Txs}}
 			    <tr>
 				  <td><a href="/transactions/{{.}}">{{.}}</a></td>
 			    </tr>

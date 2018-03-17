@@ -15,10 +15,13 @@
 			<h1>Transactions</h1>
 		</center>
 		<hr>
+
 		{{if .}}
 		<table class="table table-striped">
 		  <thead>
 		    <tr>
+		    	<th>Block</th>
+		    	<th>Created</th>
 		      <th>TXID</th>
 		      <th>From</th>
 		      <th>To</th>
@@ -26,12 +29,19 @@
 		    </tr>
 		  </thead>
 		  <tbody>
-				{{range .}}
+			{{range .}}
 			    <tr>
-				  <td><a href="/transactions/{{.hash}}" class="shortcut">{{.hash}}</a></td>
-				  <td><a href="/accounts/{{.from}}" class="shortcut">{{.from}}</a></td>
-				  <td><a href="/accounts/{{.to}}" class="shortcut">{{.to}}</a></td>
-				  <td>{{.value}}</td>
+			    <td><a href="/blocks/{{.BlockNumber}}">{{.BlockNumber}}</a></td>
+			    <td><p class="age">{{.Timestamp}}</p></td>
+				  <td><a href="/transactions/{{.Hash}}" class="shortcut">{{.Hash}}</a></td>
+				  <td><a href="/accounts/{{.From}}" class="shortcut">{{.From}}</a></td>
+				  <td>
+			      	{{if .To}}
+			      		<a href="/accounts/{{.To}}" class="shortcut">{{.To}}</a>
+			      	{{else}}
+			      		<p>Contract Deployment</a>
+			      	{{end}}
+				  <td>{{.Value}}</td>
 			    </tr>
 		    {{end}}
 		  </tbody>

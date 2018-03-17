@@ -10,7 +10,7 @@
 <body>
 	<div class="container">
 		{{template "header" .}}
-		
+
 		<center>
 			<h1>Blocks</h1>
 		</center>
@@ -26,8 +26,8 @@
 			  <tbody>
 			  	{{range .}}
 				    <tr>
-				      <th scope="row"><a href="/blocks/{{.number}}">{{.number}}</a></th>
-				      <th scope="row">{{.txs}}</th>
+				      <th scope="row"><a href="/blocks/{{.Number}}">{{.Number}}</a></th>
+				      <th scope="row">{{.TransactionsLength}}</th>
 				    </tr>
 			    {{end}}
 			  </tbody>

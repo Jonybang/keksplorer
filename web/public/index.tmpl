@@ -25,13 +25,15 @@
 			    <tr>
 			      <th>Block Number</th>
 			      <th>Transactions</th>
+			      <th>Validator</th>
 			    </tr>
 			  </thead>
 			  <tbody>
 				{{range .blocks}}
 				    <tr>
-				      <th scope="row"><a href="/blocks/{{.number}}">{{.number}}</a></th>
-				      <th scope="row">{{.txs}}</th>
+				      <th scope="row"><a href="/blocks/{{.Number}}">{{.Number}}</a></th>
+				      <th scope="row">{{.TransactionsLength}}</th>
+				      <th scope="row"><a href="/accounts/{{.Validator}}" class="shortcut">{{.Validator}}</a></th>
 				    </tr>
 			    {{end}}
 			  </tbody>
@@ -51,10 +53,16 @@
 			  <tbody>
 				{{range .txs}}
 				    <tr>
-				      <th scope="row"><a href="/transactions/{{.hash}}" class="shortcut">{{.hash}}</a></th>
-				      <th scope="row"><a href="/accounts/{{.from}}" class="shortcut">{{.from}}</a></th>
-				      <th scope="row"><a href="/accounts/{{.to}}" class="shortcut">{{.to}}</a></th>
-				      <th scope="row">{{.value}}</th>
+				      <th scope="row"><a href="/transactions/{{.Hash}}" class="shortcut">{{.Hash}}</a></th>
+				      <th scope="row"><a href="/accounts/{{.From}}" class="shortcut">{{.From}}</a></th>
+				      <th scope="row">
+				      	{{if .To}}
+				      		<a href="/accounts/{{.To}}" class="shortcut">{{.To}}</a>
+				      	{{else}}
+				      		<p>Contract Deployment</a>
+				      	{{end}}
+				    	</th>
+				      <th scope="row">{{.Value}}</th>
 				    </tr>
 			    {{end}}
 			  </tbody>
