@@ -11,24 +11,25 @@
 	<div class="container">
 		{{template "header" .}}
 
-		<h1 class="text-center">Account</h1>
-		<h6 class="text-center">address: {{.Address}}</h6>
-		<hr>
+		<section id="content">
+			<h1 class="text-center">Account</h1>
+			<h6 class="text-center">address: {{.Address}}</h6>
+			<hr>
 
-		<div class="block-table">
-			<div class="row">
-				<div class="col-md-12 bt-header">Transactions</div>
-			</div>
-			{{range .}}
+			<div class="block-table">
 				<div class="row">
-					<div class="col-md-12"><a href="/transactions/{{.}}">{{.}}</a></div>
+					<div class="col-md-12 bt-header">Transactions</div>
 				</div>
-			{{end}}
-		</div>
+				{{range .}}
+					<div class="row">
+						<div class="col-md-12"><a href="/transactions/{{.}}">{{.}}</a></div>
+					</div>
+				{{end}}
+			</div>
+		</section>
 	</div>
 
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-	<script src="/assets/js/main.js"></script>
+	<script src="assets/build/app.js"></script>
 
 </body>
 </html>

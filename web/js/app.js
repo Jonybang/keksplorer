@@ -1,3 +1,7 @@
+require('../node_modules/jquery/jquery');
+require('../node_modules/bootstrap/dist/js/bootstrap');
+require('../node_modules/popper.js/dist/popper');
+
 $(document).ready(function() {
 	$("#search-button").click(function(event) {
 		var redirectUrl = location.protocol
@@ -11,7 +15,6 @@ $(document).ready(function() {
 		event.preventDefault();
 	});
 
-	makeShorter();
 	convertTimestamp();
 });
 

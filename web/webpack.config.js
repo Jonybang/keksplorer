@@ -7,10 +7,19 @@ var config = {
 	name: "Frontend",
 	entry: {
 		'babel-polyfill': 'babel-polyfill',
-		'app.css': './styles/app.scss'
+		'app.css': './scss/app.scss',
+		'app.js': './js/app.js'
 	},
 	output: {
 		filename: './public/assets/build/[name]'
+	},
+	resolve: {
+		modules: ["node_modules"]
+	},
+	externals: {
+		// require("jquery") is external and available
+		//  on the global var jQuery
+		"jquery": "jQuery"
 	},
     devtool: 'inline-source-map',
     module: {
@@ -35,7 +44,12 @@ var config = {
                             options: {autoprefixer: true}
                         }]
                     })
-            }
+            },
+			{
+				test: /\.js$/,
+				loader: 'babel-loader',
+				exclude: /node_modules/
+			}
         ]
     },
 	plugins: [

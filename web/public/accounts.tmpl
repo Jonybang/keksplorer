@@ -11,27 +11,28 @@
 	<div class="container">
 		{{template "header" .}}
 
-		<h1 class="text-center">Accounts list</h1>
-		<hr>
-		
-		{{if .}}
-			<div class="block-table">
-				<div class="row">
-					<div class="col-md-12 bt-header">Address</div>
-				</div>
-				{{range .}}
+		<section id="content">
+			<h1 class="text-center">Accounts list</h1>
+			<hr>
+
+			{{if .}}
+				<div class="block-table">
+					<div class="row">
+						<div class="col-md-12 bt-header">Address</div>
+					</div>
+					{{range .}}
 					<div class="row">
 						<div class="col-md-12"><a href="/accounts/{{.}}">{{.}}</a></div>
 					</div>
-				{{end}}
-			</div>
-		{{else}}
-			<p class="text-center">There is no such blocks or transactions. Please wait a while...</p>
-		{{end}}
+					{{end}}
+				</div>
+			{{else}}
+				<p class="text-center">There is no such blocks or transactions. Please wait a while...</p>
+			{{end}}
+		</section>
 	</div>
 
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-	<script src="/assets/js/main.js"></script>
+	<script src="assets/build/app.js"></script>
 
 </body>
 </html>

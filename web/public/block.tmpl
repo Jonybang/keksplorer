@@ -11,39 +11,40 @@
 	<div class="container">
 		{{template "header" .}}
 
-		{{if .}}
-			<h1 class="text-center">Block #{{.block.number}}</h1>
-			<hr>
-			<p>Gas Used: {{.block.gasUsed}}</p>
-			<p>Hash: {{.block.hash}}</p>
-			<p>Number: {{.block.number}}</p>
-			<p>Size: {{.block.size}}</p>
-			<p>Timestamp: {{.block.timestamp}}</p>
-			<p>Validator: <a href="/accounts/{{.block.validator}}">{{.block.validator}}</a></p>
-		{{else}}
-			<h1 class="text-center">There is not such block</h1>
-		{{end}}
-
-		<div class="block-table">
-			<div class="row">
-				<div class="col-md-3 bt-header">TXID</div>
-				<div class="col-md-3 bt-header">To</div>
-				<div class="col-md-3 bt-header">From</div>
-				<div class="col-md-3 bt-header">Value</div>
-			</div>
-			{{range .txs}}
-				<div class="row">
-					<div class="col-md-3"><a href="/transactions/{{.hash}}">{{.hash}}</a></div>
-					<div class="col-md-3"><a href="/accounts/{{.to}}">{{.to}}</a></div>
-					<div class="col-md-3"><a href="/accounts/{{.from}}">{{.from}}</a></div>
-					<div class="col-md-3">{{.value}}</div>
-				</div>
+		<section id="content">
+			{{if .}}
+				<h1 class="text-center">Block #{{.block.number}}</h1>
+				<hr>
+				<p>Gas Used: {{.block.gasUsed}}</p>
+				<p>Hash: {{.block.hash}}</p>
+				<p>Number: {{.block.number}}</p>
+				<p>Size: {{.block.size}}</p>
+				<p>Timestamp: {{.block.timestamp}}</p>
+				<p>Validator: <a href="/accounts/{{.block.validator}}">{{.block.validator}}</a></p>
+			{{else}}
+				<h1 class="text-center">There is not such block</h1>
 			{{end}}
-		</div>
+
+			<div class="block-table">
+				<div class="row">
+					<div class="col-md-3 bt-header">TXID</div>
+					<div class="col-md-3 bt-header">To</div>
+					<div class="col-md-3 bt-header">From</div>
+					<div class="col-md-3 bt-header">Value</div>
+				</div>
+				{{range .txs}}
+					<div class="row">
+						<div class="col-md-3"><a href="/transactions/{{.hash}}">{{.hash}}</a></div>
+						<div class="col-md-3"><a href="/accounts/{{.to}}">{{.to}}</a></div>
+						<div class="col-md-3"><a href="/accounts/{{.from}}">{{.from}}</a></div>
+						<div class="col-md-3">{{.value}}</div>
+					</div>
+				{{end}}
+			</div>
+		</section>
 	</div>
 
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-	<script src="/assets/js/main.js"></script>
+	<script src="assets/build/app.js"></script>
 
 </body>
 </html>

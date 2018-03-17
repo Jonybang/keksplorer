@@ -22,3 +22,15 @@
         }
     }
 }
+
+
+@media (max-width: 575px) {
+    .container {
+        padding-right: 0;
+        padding-left: 0;
+    }
+    section#content {
+        padding: 0 10px;
+    }
+}
+
