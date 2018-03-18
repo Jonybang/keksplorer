@@ -1,55 +1,37 @@
-{{define "transactions"}}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<title>Transactions list</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<link rel="stylesheet" href="assets/build/app.css">
-</head>
-<body>
-	<div class="container">
-		{{template "header" .}}
+{{define "title"}}Transactions list{{end}}
 
-		<section id="content">
-			<h1 class="text-center">Transactions</h1>
-			<hr>
+{{define "content"}}
+	<h1 class="text-center">Transactions</h1>
+	<hr>
 
-			{{if .}}
-				<div class="block-table">
-					<div class="row">
-						<div class="col-md-2 bt-header">Block</div>
-						<div class="col-md-2 bt-header">Created</div>
-						<div class="col-md-2 bt-header">TXID</div>
-						<div class="col-md-2 bt-header">From</div>
-						<div class="col-md-2 bt-header">To</div>
-						<div class="col-md-2 bt-header">Value</div>
+	{{if .}}
+		<div class="block-table">
+			<div class="row">
+				<div class="col-md-2 bt-header">Block</div>
+				<div class="col-md-2 bt-header">Created</div>
+				<div class="col-md-2 bt-header">TXID</div>
+				<div class="col-md-2 bt-header">From</div>
+				<div class="col-md-2 bt-header">To</div>
+				<div class="col-md-2 bt-header">Value</div>
+			</div>
+			{{range .Txs}}
+				<div class="row">
+					<div class="col-md-3"><a href="/blocks/{{.BlockNumber}}">{{.BlockNumber}}</a></div>
+					<div class="col-md-3"><p class="age">{{.Timestamp}}</p></div>
+					<div class="col-md-3"><a href="/transactions/{{.Hash}}">{{.Hash}}</a></div>
+					<div class="col-md-3"><a href="/accounts/{{.From}}">{{.From}}</a></div>
+					<div class="col-md-3">
+						{{if .To}}
+							<a href="/accounts/{{.To}}">{{.To}}</a>
+						{{else}}
+							<p>Contract Deployment</a>
+						{{end}}
 					</div>
-					{{range .Txs}}
-						<div class="row">
-							<div class="col-md-3"><a href="/blocks/{{.BlockNumber}}">{{.BlockNumber}}</a></div>
-							<div class="col-md-3"><p class="age">{{.Timestamp}}</p></div>
-							<div class="col-md-3"><a href="/transactions/{{.Hash}}">{{.Hash}}</a></div>
-							<div class="col-md-3"><a href="/accounts/{{.From}}">{{.From}}</a></div>
-							<div class="col-md-3">
-								{{if .To}}
-									<a href="/accounts/{{.To}}">{{.To}}</a>
-								{{else}}
-									<p>Contract Deployment</a>
-								{{end}}
-							</div>
-							<div class="col-md-3">{{.Value}}</div>
-						</div>
-					{{end}}
+					<div class="col-md-3">{{.Value}}</div>
 				</div>
-			{{else}}
-				<p class="text-center">There is no such transactions. Please wait a while...</p>
 			{{end}}
-		</section>
-	</div>
-
-	<script src="assets/build/app.js"></script>
-
-</body>
-</html>
+		</div>
+	{{else}}
+		<p class="text-center">There is no such transactions. Please wait a while...</p>
+	{{end}}
 {{end}}

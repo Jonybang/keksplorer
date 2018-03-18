@@ -5,7 +5,7 @@
     </button>
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
+        <ul class="navbar-nav">
             <li class="nav-item">
                 <a class="nav-link" href="/">Home </a>
             </li>
@@ -19,6 +19,16 @@
                 <a class="nav-link" href="/accounts">Accounts <span class="sr-only">(current)</span></a>
             </li>
         </ul>
+
+        <div class="btn-group btn-group-toggle ml-auto mr-auto theme-toggle" data-toggle="buttons">
+            <label class="btn btn-primary">
+                <input type="radio" name="theme" value="light"> Light
+            </label>
+            <label class="btn btn-primary">
+                <input type="radio" name="theme" value="dark"> Dark
+            </label>
+        </div>
+
         <form class="form-inline my-2 my-lg-0">
             <input class="form-control mr-sm-2" type="search" id="search-input" placeholder="Search by block number" aria-label="Search">
             <button class="btn btn-outline-success my-2 my-sm-0" id="search-button" type="submit">Search</button>

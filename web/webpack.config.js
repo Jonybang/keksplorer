@@ -7,6 +7,8 @@ var config = {
 	name: "Frontend",
 	entry: {
 		'babel-polyfill': 'babel-polyfill',
+		'light-theme.css': './scss/light-theme.scss',
+		'dark-theme.css': './scss/dark-theme.scss',
 		'app.css': './scss/app.scss',
 		'app.js': './js/app.js'
 	},

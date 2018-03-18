@@ -1,51 +1,33 @@
-{{define "block"}}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<title>Block #{{.number}}</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<link rel="stylesheet" href="assets/build/app.css">
-</head>
-<body>
-	<div class="container">
-		{{template "header" .}}
+{{define "title"}}Block #{{.number}}{{end}}
 
-		<section id="content">
-			{{if .}}
-				<h1 class="text-center">Block #{{.block.number}}</h1>
-				<hr>
-				<p>Gas Used: {{.block.gasUsed}}</p>
-				<p>Hash: {{.block.hash}}</p>
-				<p>Number: {{.block.number}}</p>
-				<p>Size: {{.block.size}}</p>
-				<p>Timestamp: {{.block.timestamp}}</p>
-				<p>Validator: <a href="/accounts/{{.block.validator}}">{{.block.validator}}</a></p>
-			{{else}}
-				<h1 class="text-center">There is not such block</h1>
-			{{end}}
+{{define "content"}}
+	{{if .}}
+		<h1 class="text-center">Block #{{.block.number}}</h1>
+		<hr>
+		<p>Gas Used: {{.block.gasUsed}}</p>
+		<p>Hash: {{.block.hash}}</p>
+		<p>Number: {{.block.number}}</p>
+		<p>Size: {{.block.size}}</p>
+		<p>Timestamp: {{.block.timestamp}}</p>
+		<p>Validator: <a href="/accounts/{{.block.validator}}">{{.block.validator}}</a></p>
+	{{else}}
+		<h1 class="text-center">There is not such block</h1>
+	{{end}}
 
-			<div class="block-table">
-				<div class="row">
-					<div class="col-md-3 bt-header">TXID</div>
-					<div class="col-md-3 bt-header">To</div>
-					<div class="col-md-3 bt-header">From</div>
-					<div class="col-md-3 bt-header">Value</div>
-				</div>
-				{{range .txs}}
-					<div class="row">
-						<div class="col-md-3"><a href="/transactions/{{.hash}}">{{.hash}}</a></div>
-						<div class="col-md-3"><a href="/accounts/{{.to}}">{{.to}}</a></div>
-						<div class="col-md-3"><a href="/accounts/{{.from}}">{{.from}}</a></div>
-						<div class="col-md-3">{{.value}}</div>
-					</div>
-				{{end}}
+	<div class="block-table">
+		<div class="row">
+			<div class="col-md-3 bt-header">TXID</div>
+			<div class="col-md-3 bt-header">To</div>
+			<div class="col-md-3 bt-header">From</div>
+			<div class="col-md-3 bt-header">Value</div>
+		</div>
+		{{range .txs}}
+			<div class="row">
+				<div class="col-md-3"><a href="/transactions/{{.hash}}">{{.hash}}</a></div>
+				<div class="col-md-3"><a href="/accounts/{{.to}}">{{.to}}</a></div>
+				<div class="col-md-3"><a href="/accounts/{{.from}}">{{.from}}</a></div>
+				<div class="col-md-3">{{.value}}</div>
 			</div>
-		</section>
+		{{end}}
 	</div>
-
-	<script src="assets/build/app.js"></script>
-
-</body>
-</html>
 {{end}}
