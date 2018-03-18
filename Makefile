@@ -57,3 +57,12 @@ docker-push-web:
 	@read -p $(PUSH_MSG) version; \
 	docker tag keksplorer-web:latest chebykin/keksplorer-web:$$version; \
 	docker push chebykin/keksplorer-web:$$version
+
+chain-poa-up:
+	cd chains/configs/poa && parity --config node.toml
+
+chain-sokol-up:
+	cd chains/configs/sokol && parity --config node.toml
+
+chain-kenig54-up:
+	cd chains/configs/kenig54 && parity --config node.toml
