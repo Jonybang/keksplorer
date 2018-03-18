@@ -22,6 +22,13 @@ To simplify default networks startup we have corresponding rules:
 
 You need a full chain to be synchronized in order launch Keksplorer. This can take a plenty of time. For ex. in the case of ethereum main network, it could be a few days or even weeks.
 
+== Quick start
+
+=== Step 1. Install docker-compose
+=== Step 2. Run `docker-compose -f prod-stack.yml pull`
+=== Step 3. Run `make chain-poa-up`. Poa used as example, you can use also sokol or kenig54 networks instead.
+=== Step 4. Run `make up`. NOTICE: If you are running command not on mac, you should change `JSON_RPC_API_URL` and `WS_API_URL` environment variables in prod-stack.yml with `JSON_RPC_API_URL=http://172.17.0.0/16:8545` and `WS_API_URL=http://docker.for.mac.localhost:8546`.
+
 == keksplorer-web
 Explorer web interface and api endpoints.
 

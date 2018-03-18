@@ -8,17 +8,6 @@ services:
     networks:
       - knet
 
-  parity:
-    image: parity/parity:v1.9.4
-    ports:
-      - 8545
-      - 8546
-    command: --config /parity/config/node.toml
-    volumes:
-      - ./config/parity/sokol:/parity/config:ro
-    networks:
-      - knet
-
   web:
     image: chebykin/keksplorer-web:latest
     depends_on:
@@ -26,7 +15,7 @@ services:
     ports:
       - 8080:8080
     environment:
-      - WS_API_URL=http://parity:8546
+      - WS_API_URL=http://docker.for.mac.localhost:8546
       - REDIS_URL=redis://redis:6379/0
     networks:
       - knet
@@ -35,9 +24,8 @@ services:
     image: chebykin/keksplorer-agent:latest
     depends_on:
       - redis
-      - parity
     environment:
-      - WS_API_URL=http://parity:8546
+      - WS_API_URL=http://docker.for.mac.localhost:8546
       - REDIS_URL=redis://redis:6379/0
     networks:
       - knet
@@ -46,9 +34,8 @@ services:
     image: chebykin/keksplorer-worker:latest
     depends_on:
       - redis
-      - parity
     environment:
-      - JSON_RPC_API_URL=http://parity:8545
+      - JSON_RPC_API_URL=http://docker.for.mac.localhost:8545
       - REDIS_URL=redis://redis:6379/0
     networks:
       - knet
