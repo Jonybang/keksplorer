@@ -12,5 +12,9 @@ interface = "0.0.0.0"
 hosts = ["all"]
 apis = ["web3", "eth", "net", "parity", "traces", "rpc", "personal", "pubsub"]
 
+[footprint]
+fat_db = "on"
+pruning = "archive"
+
 [network]
 reserved_peers = "/parity/config/bootnodes.txt"

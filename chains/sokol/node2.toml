@@ -1,0 +1,23 @@
+[parity]
+chain = "./spec.json"
+base_path = "$HOME/.local/share/io.parity.ethereum"
+db_path = "$HOME/.local/share/io.parity.ethereum/chains"
+keys_path = "$HOME/.local/share/io.parity.ethereum/keys"
+
+[rpc]
+interface = "0.0.0.0"
+cors = ["all"]
+hosts = ["all"]
+apis = ["web3", "eth", "net", "parity", "traces", "rpc", "personal"]
+
+[websockets]
+interface = "0.0.0.0"
+hosts = ["all"]
+apis = ["web3", "eth", "net", "parity", "traces", "rpc", "personal", "pubsub"]
+
+[footprint]
+fat_db = "on"
+pruning = "archive"
+
+[network]
+reserved_peers = "./bootnodes.txt"
