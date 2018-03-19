@@ -36,6 +36,31 @@ Run `make chain-poa-up`. Poa used as example, you can use also sokol or kenig54 
 === Step 4. 
 Run `make up`. NOTICE: If you are using ubuntu, you should change `JSON_RPC_API_URL` and `WS_API_URL` environment variables in prod-stack.yml with `JSON_RPC_API_URL=http://172.17.0.0/16:8545` and `WS_API_URL=http://172.17.0.0/16:8546`.
 
+
+== Quick start for development
+
+=== Step 1.
+Run redis with docker `docker run --name redis-keksplorer -p 6379:6379 -d redis`.
+
+=== Step 2.
+Run parity via `make chain-poa-up` or using your own parity instance.
+
+=== Step 3.
+Install all dependencies via `make install-deps`.
+
+=== Step 4.
+Run agent via `make agent-dev`.
+
+=== Step 5.
+Run worker via `make worker-dev`.
+
+=== Step 6.
+Run web via `make web-dev`
+
+=== Step 7.
+Go to `localhost:8080`.
+
+
 == keksplorer-web
 Explorer web interface and api endpoints.
 

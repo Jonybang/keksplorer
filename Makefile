@@ -10,6 +10,9 @@ worker-dev:
 agent-dev:
 	export $(ENV_VARS) && node agent/agent.js
 
+web-dev:
+	export REDIS_URL=redis://127.0.0.1:6379 && cd web && go run server.go models.go
+
 up:
 	docker-compose -f prod-stack.yml up
 
@@ -30,6 +33,11 @@ up-dev:
 
 down-dev:
 	docker-compose -f dev-stack.yml down
+
+install-deps:
+	cd agent && npm i && cd ../ && \
+	cd worker && npm i && cd ../ && \
+	cd web && dep ensure
 
 docker-build-worker:
 	cd worker && docker build -t keksplorer-worker .
