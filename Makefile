@@ -16,6 +16,9 @@ up:
 down:
 	docker-compose -f prod-stack.yml down --volumes
 
+pull:
+	docker-compose -f prod-stack.yml pull
+
 up-daemon:
 	docker-compose -f prod-stack.yml up -d
 
