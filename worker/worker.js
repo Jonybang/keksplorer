@@ -83,7 +83,7 @@ async function checkConnections() {
             .then((res) => {
                 let promises = [];
 
-                let len = (res.length > 10000) ? 10000 : res.length;
+                let len = (res.length > 1000) ? 1000 : res.length;
 
                 logger.log({level: 'info', message: `Blocks to parse: ${len} of ${res.length}`});
 

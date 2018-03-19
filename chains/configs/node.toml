@@ -1,6 +1,6 @@
 [parity]
 chain = "./spec.json"
-base_path = "../../data/"
+base_path = "../../data"
 db_path = "../../data/chains"
 keys_path = "../../data/keys"
 
@@ -9,6 +9,7 @@ interface = "0.0.0.0"
 cors = ["all"]
 hosts = ["all"]
 apis = ["web3", "eth", "net", "parity", "traces", "rpc", "personal"]
+processing_threads = 4
 
 [websockets]
 interface = "0.0.0.0"
