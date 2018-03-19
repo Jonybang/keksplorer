@@ -9,7 +9,7 @@ services:
       - knet
 
   web:
-    image: chebykin/keksplorer-web:latest
+    image: kenigtech/keksplorer-web:latest
     depends_on:
       - redis
     ports:
@@ -21,7 +21,7 @@ services:
       - knet
 
   agent:
-    image: chebykin/keksplorer-agent:latest
+    image: kenigtech/keksplorer-agent:latest
     depends_on:
       - redis
     environment:
@@ -31,7 +31,7 @@ services:
       - knet
 
   worker:
-    image: chebykin/keksplorer-worker:latest
+    image: kenigtech/keksplorer-worker:latest
     depends_on:
       - redis
     environment:

@@ -56,18 +56,18 @@ docker-build-web: clean
 
 docker-push-worker:
 	@read -p $(PUSH_MSG) version; \
-	docker tag keksplorer-worker:latest chebykin/keksplorer-worker:$$version; \
-	docker push chebykin/keksplorer-worker:$$version
+	docker tag keksplorer-worker:latest kenigtech/keksplorer-worker:$$version; \
+	docker push kenigtech/keksplorer-worker:$$version
 
 docker-push-agent:
 	@read -p $(PUSH_MSG) version; \
-	docker tag keksplorer-agent:latest chebykin/keksplorer-agent:$$version; \
-	docker push chebykin/keksplorer-agent:$$version
+	docker tag keksplorer-agent:latest kenigtech/keksplorer-agent:$$version; \
+	docker push kenigtech/keksplorer-agent:$$version
 
 docker-push-web:
 	@read -p $(PUSH_MSG) version; \
-	docker tag keksplorer-web:latest chebykin/keksplorer-web:$$version; \
-	docker push chebykin/keksplorer-web:$$version
+	docker tag keksplorer-web:latest kenigtech/keksplorer-web:$$version; \
+	docker push kenigtech/keksplorer-web:$$version
 
 chain-poa-up:
 	cd chains/configs/poa && parity --config node.toml
