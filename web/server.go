@@ -56,6 +56,7 @@ func main() {
 	r.HandleFunc("/transactions/{hash}", transactionViewController).Methods("GET")
 	r.HandleFunc("/accounts", accountsViewController).Methods("GET")
 	r.HandleFunc("/accounts/{address}", accountViewController).Methods("GET")
+	r.HandleFunc("/chart/{chartName}", chartController).Methods("GET")
 
 	// API
 	r.HandleFunc("/api/latest_block", latestBlockController).Methods("GET")
@@ -72,9 +73,14 @@ func main() {
 		Handler(http.StripPrefix("/assets", http.FileServer(
 			http.Dir("./public/assets/"))))
 
+	port := "8080"
+	if os.Getenv("PORT") != ""{
+		port = os.Getenv("PORT")
+	}
+
 	srv := &http.Server{
 		Handler:      r,
-		Addr:         "0.0.0.0:8081",
+		Addr:         "0.0.0.0:" + port,
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  20 * time.Second,
 	}
@@ -234,6 +240,13 @@ func accountViewController(w http.ResponseWriter, r *http.Request) {
 	tmpl := getTemplate("account")
 
 	tmpl.ExecuteTemplate(w, "base", account)
+}
+
+func chartController(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	tmpl := getTemplate(vars["chartName"])
+
+	tmpl.ExecuteTemplate(w, "base", "")
 }
 
 func getTemplate(templateName string) (*template.Template) {
