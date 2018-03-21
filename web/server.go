@@ -72,9 +72,14 @@ func main() {
 		Handler(http.StripPrefix("/assets", http.FileServer(
 			http.Dir("./public/assets/"))))
 
+	port := "8080"
+	if os.Getenv("PORT") != ""{
+		port = os.Getenv("PORT")
+	}
+
 	srv := &http.Server{
 		Handler:      r,
-		Addr:         "0.0.0.0:8080",
+		Addr:         "0.0.0.0:" + port,
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  20 * time.Second,
 	}
