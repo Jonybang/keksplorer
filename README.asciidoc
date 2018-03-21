@@ -2,6 +2,65 @@
 
 NOTE: Check out the latest dev build at http://188.166.61.140:8080/
 
+== Setting up Parity node
+=== Step 1. Install parity
+If you have no Parity installed yet, you could set it up on you computer. Check out Parity github for the latest version here https://github.com/paritytech/parity/releases. The configs form the following steps are adjusted for v1.9.x versions.
+
+=== Step 2. Configuration
+We placed network configuration files for the following networks: `poa`, `sokol`, `kenig54`. You don't need to perform any configuration in these cases, just go to the following step.
+
+If you want to set up another network, create your own folder under `${repo_root}/configs` and fill it with `bootnodes.txt` (optional) and `spec.json` (mandatory). `node.toml` file could be symlinked to the common `node.toml` in the upper directory.
+
+=== Step 3. Run parity
+Make sure `make` util is installed on your system. Otherwise check out `Makefile` for running parity commands.
+
+To simplify default networks startup we have corresponding rules:
+
+* `make chain-poa-up`
+* `make chain-sokol-up`
+* `make chain-kenig54-up`
+
+You need a full chain to be synchronized in order launch Keksplorer. This can take a plenty of time. For ex. in the case of ethereum main network, it could be a few days or even weeks.
+
+== Quick start
+
+=== Step 1.
+Install docker-compose
+
+=== Step 2.
+Run `make pull`
+
+=== Step 3.
+Run `make chain-poa-up`. Poa used as example, you can use also sokol or kenig54 networks instead.
+
+=== Step 4. 
+Run `make up`. NOTICE: If you are using ubuntu, you should change `JSON_RPC_API_URL` and `WS_API_URL` environment variables in prod-stack.yml with `JSON_RPC_API_URL=http://172.17.0.0/16:8545` and `WS_API_URL=http://172.17.0.0/16:8546`.
+
+
+== Quick start for development
+
+=== Step 1.
+Run redis with docker `docker run --name redis-keksplorer -p 6379:6379 -d redis`.
+
+=== Step 2.
+Run parity via `make chain-poa-up` or using your own parity instance.
+
+=== Step 3.
+Install all dependencies via `make install-deps`.
+
+=== Step 4.
+Run agent via `make agent-dev`.
+
+=== Step 5.
+Run worker via `make worker-dev`.
+
+=== Step 6.
+Run web via `make web-dev`
+
+=== Step 7.
+Go to `localhost:8080`.
+
+
 == keksplorer-web
 Explorer web interface and api endpoints.
 

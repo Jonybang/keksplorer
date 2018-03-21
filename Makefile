@@ -10,11 +10,17 @@ worker-dev:
 agent-dev:
 	export $(ENV_VARS) && node agent/agent.js
 
+web-dev:
+	export REDIS_URL=redis://127.0.0.1:6379 && cd web && go run server.go models.go
+
 up:
 	docker-compose -f prod-stack.yml up
 
 down:
 	docker-compose -f prod-stack.yml down --volumes
+
+pull:
+	docker-compose -f prod-stack.yml pull
 
 up-daemon:
 	docker-compose -f prod-stack.yml up -d
@@ -27,6 +33,11 @@ up-dev:
 
 down-dev:
 	docker-compose -f dev-stack.yml down
+
+install-deps:
+	cd agent && npm i && cd ../ && \
+	cd worker && npm i && cd ../ && \
+	cd web && dep ensure
 
 docker-build-worker:
 	cd worker && docker build -t keksplorer-worker .
@@ -45,15 +56,24 @@ docker-build-web: clean
 
 docker-push-worker:
 	@read -p $(PUSH_MSG) version; \
-	docker tag keksplorer-worker:latest chebykin/keksplorer-worker:$$version; \
-	docker push chebykin/keksplorer-worker:$$version
+	docker tag keksplorer-worker:latest kenigtech/keksplorer-worker:$$version; \
+	docker push kenigtech/keksplorer-worker:$$version
 
 docker-push-agent:
 	@read -p $(PUSH_MSG) version; \
-	docker tag keksplorer-agent:latest chebykin/keksplorer-agent:$$version; \
-	docker push chebykin/keksplorer-agent:$$version
+	docker tag keksplorer-agent:latest kenigtech/keksplorer-agent:$$version; \
+	docker push kenigtech/keksplorer-agent:$$version
 
 docker-push-web:
 	@read -p $(PUSH_MSG) version; \
-	docker tag keksplorer-web:latest chebykin/keksplorer-web:$$version; \
-	docker push chebykin/keksplorer-web:$$version
+	docker tag keksplorer-web:latest kenigtech/keksplorer-web:$$version; \
+	docker push kenigtech/keksplorer-web:$$version
+
+chain-poa-up:
+	cd chains/configs/poa && parity --config node.toml
+
+chain-sokol-up:
+	cd chains/configs/sokol && parity --config node.toml
+
+chain-kenig54-up:
+	cd chains/configs/kenig54 && parity --config node.toml

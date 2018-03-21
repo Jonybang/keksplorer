@@ -1,16 +1,28 @@
 [parity]
-chain = "/parity/config/spec.json"
+chain = "./spec.json"
+base_path = "../../data"
+db_path = "../../data/chains"
+keys_path = "../../data/keys"
 
 [rpc]
 interface = "0.0.0.0"
 cors = ["all"]
 hosts = ["all"]
 apis = ["web3", "eth", "net", "parity", "traces", "rpc", "personal"]
+processing_threads = 4
 
 [websockets]
 interface = "0.0.0.0"
 hosts = ["all"]
 apis = ["web3", "eth", "net", "parity", "traces", "rpc", "personal", "pubsub"]
 
+[footprint]
+fat_db = "on"
+pruning = "archive"
+
 [network]
-reserved_peers = "/parity/config/bootnodes.txt"
+reserved_peers = "./bootnodes.txt"
+
+[ui]
+interface = "127.0.0.1"
+port = 8180
