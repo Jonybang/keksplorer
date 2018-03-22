@@ -21,7 +21,7 @@ type Transaction struct {
 	GasPrice    string `json:"gasPrice"`
 	Nonce       string `json:"nonce"`
 	BlockNumber string `json:"blockNumber"`
-	Timestamp   string
+	Timestamp   string `json:"timestamp"`
 }
 
 type Account struct {

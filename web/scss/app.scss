@@ -84,6 +84,13 @@
     }
 }
 
+.lineChart {
+    .yAxis, .xAxis {
+        .domain {
+            stroke: none;
+        }
+    }
+}
 
 @media (max-width: 575px) {
     .container {

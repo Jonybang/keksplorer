@@ -1,3 +1,14 @@
 @import "~bootswatch/dist/darkly/variables";
 @import "~bootstrap/scss/bootstrap";
 @import "~bootswatch/dist/darkly/bootswatch";
+
+.lineChart {
+    .xAxis, .yAxis {
+        line {
+            stroke: $gray-500; //rgba(255, 255, 255, 0.5);
+        }
+        text {
+            fill: $gray-500;
+        }
+    }
+}

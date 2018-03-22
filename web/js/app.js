@@ -30,6 +30,7 @@ $(document).ready(function() {
 		$('#theme-style').attr('href', 'assets/build/' + themeName + '-theme.css');
 
 		setTimeout(function () {
+			document.body.dispatchEvent(new Event('change-theme'));
 			$('.loading').hide();
 			setThemeElements(themeName);
 		}, 500);
