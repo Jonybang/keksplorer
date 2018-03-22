@@ -5,7 +5,7 @@ clean:
 	rm -rf ./build
 
 worker-dev:
-	export $(ENV_VARS) && node worker/worker.js
+	export $(ENV_VARS) && go run worker/worker.go
 
 agent-dev:
 	export $(ENV_VARS) && node agent/agent.js
@@ -36,11 +36,17 @@ down-dev:
 
 install-deps:
 	cd agent && npm i && cd ../ && \
-	cd worker && npm i && cd ../ && \
+	cd worker && dep ensure && cd ../ && \
 	cd web && dep ensure
 
 docker-build-worker:
-	cd worker && docker build -t keksplorer-worker .
+	mkdir -p ./build/gopath/src/worker
+	cp -r ./worker/* ./build/gopath/src/worker
+	export GOPATH=`pwd`/build/gopath; \
+	cd ./build/gopath/src/worker; \
+	dep ensure; \
+	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o worker .; \
+	docker build -t keksplorer-worker .
 
 docker-build-agent:
 	cd agent && docker build -t keksplorer-agent .
