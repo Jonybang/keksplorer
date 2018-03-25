@@ -1,6 +1,7 @@
 .idea/
 node_modules/
 vendor/
+worker.go.swp
 
 /build
 /.env
