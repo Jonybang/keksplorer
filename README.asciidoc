@@ -60,6 +60,15 @@ Run web via `make web-dev`
 === Step 7.
 Go to `localhost:8080`.
 
+== Switch to sokol network:
+#stop chain-poa-up
+#stop agent-dev
+#stop worker-dev
+docker ps
+docker exec -it FIRST_3_SYMBOLS_OF_REDIS_CONTAINER_ID redis-cli flushall
+make chain-sokol-up
+make agent-dev
+make worker-dev
 
 == keksplorer-web
 Explorer web interface and api endpoints.
