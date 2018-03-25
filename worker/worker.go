@@ -13,7 +13,7 @@ import (
 	"github.com/goodstemy/w3/complex/types"
 	"github.com/goodstemy/w3/providers"
 	"regexp"
-	abi "github.com/ethereum/go-ethereum/accounts/abi"
+	//abi "github.com/ethereum/go-ethereum/accounts/abi"
 )
 
 const version = "0.1.0"
@@ -236,7 +236,7 @@ func parseTransaction(pipe redis.Pipeliner, txHash string) error {
 	if tx.To == "" {
 		//TODO: handle contract deployment
 	} else {
-		
+
 		if strings.HasPrefix(tx.Input, "0xa9059cbb") {
 			//0xa9059cbb means transfer tokens method
 			runes := []rune(tx.Input)
@@ -255,7 +255,8 @@ func parseTransaction(pipe redis.Pipeliner, txHash string) error {
 			 */
 		} else if tx.Input != "" {
 			//TODO: get abiJsonString from contract info and test
-
+			//log.Printf("Unexpected input in transaction:\n%v\nTx hash: %v\nContract: %v\n",
+			//	tx.Input, tx.Hash, tx.To)
 			//myAbi, err := abi.JSON(strings.NewReader(abiJsonString))
 			//if err != nil {
 			//	log.Fatal(err)
