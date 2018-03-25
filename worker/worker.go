@@ -8,12 +8,12 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
 	"github.com/go-redis/redis"
 	web3 "github.com/goodstemy/w3"
 	"github.com/goodstemy/w3/complex/types"
 	"github.com/goodstemy/w3/providers"
 	"regexp"
+	abi "github.com/ethereum/go-ethereum/accounts/abi"
 )
 
 const version = "0.1.0"
@@ -236,15 +236,35 @@ func parseTransaction(pipe redis.Pipeliner, txHash string) error {
 	if tx.To == "" {
 		//TODO: handle contract deployment
 	} else {
+		
 		if strings.HasPrefix(tx.Input, "0xa9059cbb") {
 			//0xa9059cbb means transfer tokens method
 			runes := []rune(tx.Input)
 			//method := string(runes[0:10])
 			re := regexp.MustCompile("^0+")
-			to_address := re.ReplaceAllLiteralString(string(runes[11:74]), "")
+			to_address := "0x" + re.ReplaceAllLiteralString(string(runes[11:74]), "")
 			value, _ := strconv.ParseUint("0x" + string(runes[75:138]), 0, 64)
-			log.Printf("Token transaction in count %v to address %v\nHash: %v\n",
-				value, to_address, tx.Hash)
+
+			log.Printf("Token transaction in count %v to address %v\nContract: %v\nHash: %v\n",
+				value, to_address, tx.To, tx.Hash)
+			/*
+			Output example:
+			Token transaction in count 1000 to address 0xe47494379c1d48ee73454c251a6395fdd4f9eb43
+			Contract: 0xadfe00d92e5a16e773891f59780e6e54f40b532e
+			Hash: 0xbe5d15e63e151142a525812cc02a08f8e6489af1b7720c54378d75220fe0422b
+			 */
+		} else if tx.Input != "" {
+			//TODO: get abiJsonString from contract info and test
+
+			//myAbi, err := abi.JSON(strings.NewReader(abiJsonString))
+			//if err != nil {
+			//	log.Fatal(err)
+			//}
+			//var ifc map[string]interface{}
+			//err = myAbi.Unpack(&ifc, "someMethod", tx.Input)
+			//if err != nil {
+			//	log.Fatal(err)
+			//}
 		}
 		_, err = pipe.ZAdd(fmt.Sprintf("block_tx:%v:%v:list", tx.BlockNumber, tx.Hash),
 			redis.Z{

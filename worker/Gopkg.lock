@@ -2,36 +2,27 @@
 
 
 [[projects]]
+  branch = "master"
+  name = "github.com/btcsuite/btcd"
+  packages = ["btcec"]
+  revision = "2be2f12b358dc57d70b8f501b00be450192efbc3"
+
+[[projects]]
+  name = "github.com/ethereum/go-ethereum"
+  packages = ["accounts/abi","common","common/hexutil","common/math","crypto","crypto/secp256k1","crypto/sha3","rlp"]
+  revision = "b8b9f7f4476a30a0aaf6077daade6ae77f969960"
+  version = "v1.8.2"
+
+[[projects]]
   name = "github.com/go-redis/redis"
-  packages = [
-    ".",
-    "internal",
-    "internal/consistenthash",
-    "internal/hashtag",
-    "internal/pool",
-    "internal/proto",
-    "internal/singleflight",
-    "internal/util"
-  ]
+  packages = [".","internal","internal/consistenthash","internal/hashtag","internal/pool","internal/proto","internal/singleflight","internal/util"]
   revision = "877867d2845fbaf86798befe410b6ceb6f5c29a3"
   version = "v6.10.2"
 
 [[projects]]
   branch = "master"
   name = "github.com/goodstemy/w3"
-  packages = [
-    ".",
-    "complex/types",
-    "constants",
-    "dto",
-    "eth",
-    "eth/block",
-    "net",
-    "personal",
-    "providers",
-    "providers/util",
-    "utils"
-  ]
+  packages = [".","complex/types","constants","dto","eth","eth/block","net","personal","providers","providers/util","utils"]
   revision = "b1fdd0de833e5fd256a7159fa1cee1bb129de1f5"
 
 [[projects]]
@@ -43,6 +34,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "d0dfe759eb5d3195bb768238fb0aeb00343c3c03f615babef23de20a84719cdb"
+  inputs-digest = "faee80847b1998dc434ca3cf99133d7abb312c7bd238483b61883bc93531c0e1"
   solver-name = "gps-cdcl"
   solver-version = 1
