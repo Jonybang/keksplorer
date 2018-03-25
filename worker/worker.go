@@ -13,6 +13,7 @@ import (
 	web3 "github.com/goodstemy/w3"
 	"github.com/goodstemy/w3/complex/types"
 	"github.com/goodstemy/w3/providers"
+	"regexp"
 )
 
 const version = "0.1.0"
@@ -235,6 +236,16 @@ func parseTransaction(pipe redis.Pipeliner, txHash string) error {
 	if tx.To == "" {
 		//TODO: handle contract deployment
 	} else {
+		if strings.HasPrefix(tx.Input, "0xa9059cbb") {
+			//0xa9059cbb means transfer tokens method
+			runes := []rune(tx.Input)
+			//method := string(runes[0:10])
+			re := regexp.MustCompile("^0+")
+			to_address := re.ReplaceAllLiteralString(string(runes[11:74]), "")
+			value, _ := strconv.ParseUint("0x" + string(runes[75:138]), 0, 64)
+			log.Printf("Token transaction in count %v to address %v\nHash: %v\n",
+				value, to_address, tx.Hash)
+		}
 		_, err = pipe.ZAdd(fmt.Sprintf("block_tx:%v:%v:list", tx.BlockNumber, tx.Hash),
 			redis.Z{
 				Score:  1,
