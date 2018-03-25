@@ -237,6 +237,7 @@ func parseTransaction(pipe redis.Pipeliner, txHash string) error {
 		//TODO: handle contract deployment
 	} else {
 
+		//TODO: find method in database by method prefix in transaction input
 		if strings.HasPrefix(tx.Input, "0xa9059cbb") {
 			//0xa9059cbb means transfer tokens method
 			runes := []rune(tx.Input)
@@ -254,9 +255,11 @@ func parseTransaction(pipe redis.Pipeliner, txHash string) error {
 			Hash: 0xbe5d15e63e151142a525812cc02a08f8e6489af1b7720c54378d75220fe0422b
 			 */
 		} else if tx.Input != "" {
-			//TODO: get abiJsonString from contract info and test
+			//WRONG WAY: there is no way to get abiJsonString from w3.Eth.GetCode
 			//log.Printf("Unexpected input in transaction:\n%v\nTx hash: %v\nContract: %v\n",
 			//	tx.Input, tx.Hash, tx.To)
+			//contract_code, err := w3.Eth.GetCode(tx.To)
+			//TODO: get abiJsonString from database by contract address
 			//myAbi, err := abi.JSON(strings.NewReader(abiJsonString))
 			//if err != nil {
 			//	log.Fatal(err)
